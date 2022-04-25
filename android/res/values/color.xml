@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_background_color">#FFFFFFFF</color>
+    <color name="white">#F6F5F3</color>
+    <color name="blue">#B5D9D9</color>
+    <color name="beige">#CFB9A5</color>
+    <color name="darkblue">#1E96A6</color>
+    <color name="lightgrey">#D3D3D3</color>
+    <color name="hotpink">#ff69b4</color>
+    <color name="pastelpink">#ffb6c1</color>
+    <color name="mauve">#db7093</color>
+    <color name="lightpink">#ffc0cb</color>
+    <color name="green">#1B5E20</color>
+    <color name="green_dark">#003300</color>
+    <color name="green_light">#A5D6A7</color>
+    <color name="blue_dark">#005B9F</color>
+    <color name="blue_light">#81D4FA</color>
+    <color name="bubbldgumpink">#dda0dd</color>
+    <color name="lightblue">#add8e6</color>
+    <color name="lightyellow">#ffebcd</color>
+    <color name="lightgreen">#8fbc8f</color>
+    <color name="darkpurple">#483d8b</color>
+    <color name="darkpink">#b03060</color>
+    <color name="darkgreengray">#2f4f4f</color>
+    <color name="midnightblue">#191970</color>
+    <color name="black">#000000</color>
+    <color name="darkblueblack">#000033</color>
+</resources>

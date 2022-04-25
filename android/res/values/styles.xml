@@ -1,0 +1,85 @@
+<resources>
+
+    <style name="GdxTheme" parent="AppTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/blue</item>
+        <item name="colorPrimaryDark">@color/darkblue</item>
+        <item name="colorAccent">@color/beige</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@color/lightgrey</item>
+    </style>
+
+    <!-- Alert dialog theme -->
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="LightMode" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/blue_light</item>
+        <item name="colorPrimaryVariant">@color/darkblue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/blue_light</item>
+        <item name="colorSecondaryVariant">@color/blue_dark</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+    </style>
+    <!-- Dark mode -->
+    <style name="DarkMode" parent="Theme.AppCompat.DayNight">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/midnightblue</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/darkblueblack</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/darkgreengray</item>
+    </style>
+    <!-- Pastel theme -->
+    <style name="PastelMode" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/pastelpink</item>
+        <item name="colorPrimaryVariant">@color/lightgreen</item>
+        <item name="colorOnPrimary">@color/lightyellow</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/lightyellow</item>
+        <item name="colorSecondaryVariant">@color/lightgrey</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:background">@color/lightgreen</item>
+
+    </style>
+
+
+    <!-- Elle Woods theme -->
+    <style name="ElleWoodsMode" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/hotpink</item>
+        <item name="colorPrimaryDark">@color/hotpink</item>
+        <item name="colorAccent">@color/lightpink</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@color/pastelpink</item>
+    </style>
+
+
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

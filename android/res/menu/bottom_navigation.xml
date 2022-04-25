@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_calendar"
+        android:icon="@drawable/ic_calendar_white_24dp"
+        android:title="Calendar"/>
+
+    <item
+        android:id="@+id/nav_bakery"
+        android:icon="@drawable/ic_cake_white_24dp"
+        android:title="Bakery"/>
+
+    <item
+        android:id="@+id/nav_timer"
+        android:icon="@drawable/ic_timer_white_24dp"
+        android:title="Timer"/>
+
+    <item
+        android:id="@+id/nav_notes"
+        android:icon="@drawable/ic_note_white_24dp"
+        android:title="Notes"/>
+
+    <item
+        android:id="@+id/nav_classes"
+        android:icon="@drawable/ic_class_white_24dp"
+        android:title="Classes"/>
+</menu>

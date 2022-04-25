@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TaskActivity">
+
+    <EditText
+        android:id="@+id/name_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="70sp"
+        android:focusable="false"
+        android:background="@null"
+        android:padding="10dp"/>
+
+    <EditText
+        android:id="@+id/description_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_et"
+        android:textSize="30sp"
+        android:focusable="false"
+        android:background="@null"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/date_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description_et"
+        android:text="@string/due_date"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+    <TextView
+        android:id="@+id/date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description_et"
+        android:layout_toEndOf="@id/date_label_tv"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/start_time_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date_label_tv"
+        android:text="@string/start_time"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+    <TextView
+        android:id="@+id/start_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/date_label_tv"
+        android:layout_toEndOf="@id/start_time_label_tv"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/notify_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_time_label_tv"
+        android:text="@string/notify"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+    <CheckBox
+        android:id="@+id/notify_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/start_time_label_tv"
+        android:layout_toEndOf="@id/notify_tv"/>
+
+    <TextView
+        android:id="@+id/priority_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notify_tv"
+        android:text="@string/priority"
+        android:textSize="30sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/priority_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notify_tv"
+        android:layout_toEndOf="@id/priority_tv"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/completed_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/priority_tv"
+        android:text="Completed: "
+        android:textSize="30sp"
+        android:padding="10dp"/>
+    <CheckBox
+        android:id="@+id/completed_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/priority_tv"
+        android:layout_toEndOf="@id/completed_tv"/>
+
+</RelativeLayout>

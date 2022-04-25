@@ -1,0 +1,40 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="reply_entries">
+        <item>Reply</item>
+        <item>Reply to all</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>reply</item>
+        <item>reply_all</item>
+    </string-array>
+
+    <string-array name="theme_entries">
+        <item>Light mode</item>
+        <item>Dark mode</item>
+        <item>Pastel mode</item>
+        <item>Elle Woods mode</item>
+    </string-array>
+
+    <string-array name="theme_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>pastel</item>
+        <item>elle_woods</item>
+    </string-array>
+
+    <string-array name="notification_offsets_entries">
+        <item>Time of task</item>
+        <item>10 minutes before</item>
+        <item>30 minutes before</item>
+        <item>1 hour before</item>
+    </string-array>
+
+    <string-array name="notification_offsets_values">
+        <item>time_of_task</item>
+        <item>minutes10</item>
+        <item>minutes30</item>
+        <item>minutes60</item>
+    </string-array>
+</resources>

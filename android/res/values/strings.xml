@@ -1,0 +1,171 @@
+<resources>
+    <string name="app_name">Study Muffin</string>
+    <string name="title_activity_fab">FabActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <!-- Bakery Strings -->
+    <string name="open_bakery">Open Bakery</string>
+
+    <!-- Timer strings -->
+    <string name="separator_string">:</string>
+    <string name="timer_initial">00</string>
+    <string name="start_button">Start</string>
+    <string name="reset_button">Reset</string>
+    <string name="pause_button">Pause</string>
+    <string name="timer_finished">You finished the timer!</string>
+    <string name="timer_exited">You exited the timer</string>
+
+    <!-- Task type selection dialog strings -->
+    <string name="task_selection_dialog_title">Select Task Type</string>
+    <string name="create_assignment">Create Assignment</string>
+    <string name="create_assessment">Create Assessment</string>
+    <string name="create_physical_meeting">Create Physical Meeting</string>
+    <string name="create_virtual_meeting">Create Virtual Meeting</string>
+
+    <!-- Task creation dialog strings-->
+    <string name="name_string">Name</string>
+    <string name="time_spinner_string">Time</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="task_dialog_title">Create New Task</string>
+    <string name="description_string">Description</string>
+    <string name="due_date">Due Date</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create</string>
+    <string name="empty_fields">You must fill out all of the fields to create a task</string>
+    <string name="day_dialog_empty">You must choose at least one day</string>
+    <string name="time_dialog_title">Select Time</string>
+    <string name="notify">Notify Me</string>
+    <string name="recurring">Recurring</string>
+    <string name="location">Location</string>
+    <string name="zoom_link">Zoom Link</string>
+    <string name="course">Class</string>
+    <string name="points_possible">Points Possible</string>
+    <string name="priority">Priority</string>
+    <string name="create_course">You must create a course before creating a task</string>
+
+    <!-- priority strings -->
+    <string-array name="priority_array">
+        <item>Low Priority</item>
+        <item>Medium Priority</item>
+        <item>High Priority</item>
+    </string-array>
+
+    <!-- attribute switcher strings -->
+    <string-array name="attribute_switch_spinner_array">
+        <item>Name</item>
+        <item>Date</item>
+        <item>Location</item>
+        <item>Zoom Link</item>
+        <item>Completed</item>
+        <item>Low Priority</item>
+        <item>Medium Priority</item>
+        <item>High Priority</item>
+    </string-array>
+
+    <!-- Months -->
+    <string-array name="months_array">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <string-array name="time_spinner_array">
+        <item>08:00</item>
+        <item>12:00</item>
+        <item>16:00</item>
+        <item>20:00</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="day_spinner_array">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Every Day</item>
+        <item>Custom</item>
+    </string-array>
+    <string name="title_activity_course">CourseActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Menu Main Titles -->
+    <string name="settings_item">Settings</string>
+    <string name="search_item">Search</string>
+    <string name="delete_item">Delete</string>
+    <string name="edit_item">Edit</string>
+    <string name="clear_selection_item">Clear Selection</string>
+    <string name="clear_search_item">Clear Search</string>
+
+    <!-- Menu Task Titles -->
+    <string name="save_item">Save</string>
+    <string name="cancel_item">Cancel</string>
+    <string name="filter_item">Filter</string>
+    <string name="sort_priority_item">Sort by Priority</string>
+    <string name="sort_due_date_item">Sort by Due Date</string>
+
+    <!-- Preference Titles -->
+    <string name="notifications_header">Notifications</string>
+    <string name="themes_header">Themes</string>
+
+    <!-- Theme Preferences -->
+    <string name="theme_title">Choose your theme</string>
+
+    <!-- Notification Preferences -->
+    <string name="notification_offsets_title">Notification Offsets</string>
+    <string name="notification_switch_title">Receive notifications</string>
+    <string name="notification_switch_summary_on">Receive notifications for the tasks you chose to
+        notify you</string>
+    <string name="notification_switch_summary_off">Disable all notifications, regardless of
+        individual task settings</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="title_activity_task">TaskActivity</string>
+
+    <!-- Notification Strings -->
+    <string name="check_str">Check</string>
+
+    <!-- Sarita stuff -->
+    <string name="colour_indicator">Colour indicator</string>
+    <string name="colour_navigation_bar">Colour Navigation Bar</string>
+    <string name="confirm_delete">Confirm Deletion</string>
+    <string name="confirm_delete_text">Are you sure you want to delete this note?</string>
+    <string name="delete">Delete</string>
+    <string name="empty_list_text">Press the button on the bottom right to add a new note!</string>
+    <string name="exception">Exception: </string>
+    <string name="font_colour">Font Colour</string>
+    <string name="new_note">New Note</string>
+    <string name="no">No</string>
+    <string name="note">Note</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+    <string name="share_to">Share to:</string>
+    <string name="share">Share</string>
+    <string name="sort">Sort</string>
+    <string name="title">Title</string>
+    <string name="yes">Yes</string>
+    <string name="undo">Undo</string>
+</resources>

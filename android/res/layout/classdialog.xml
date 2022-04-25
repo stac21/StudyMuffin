@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/name_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"/>
+
+    <EditText
+        android:id="@+id/link_et"
+        android:layout_below= "@id/name_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Zoom link"/>
+
+    <EditText
+        android:id="@+id/instructor_et"
+        android:layout_below= "@id/link_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Instructor"/>
+
+    <EditText
+        android:id="@+id/location_et"
+        android:layout_below= "@id/instructor_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location"/>
+
+    <EditText
+        android:id="@+id/day_time_et"
+        android:layout_below= "@id/location_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Days and time"/>
+
+
+
+</RelativeLayout>

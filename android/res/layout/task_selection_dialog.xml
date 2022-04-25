@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RadioGroup
+        android:id="@+id/task_selection_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/assignment_rb"
+            android:text="@string/create_assignment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_margin="5dp"/>
+
+        <RadioButton
+            android:id="@+id/assessment_rb"
+            android:text="@string/create_assessment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/assignment_rb"
+            android:layout_margin="5dp"/>
+
+        <RadioButton
+            android:id="@+id/physical_meeting_rb"
+            android:text="@string/create_physical_meeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/assessment_rb"
+            android:layout_margin="5dp"/>
+
+        <RadioButton
+            android:id="@+id/virtual_meeting_rb"
+            android:text="@string/create_virtual_meeting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/physical_meeting_rb"
+            android:layout_margin="5dp"/>
+    </RadioGroup>
+</RelativeLayout>

@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "170410199510",
+    "firebase_url": "https://study-muffin-6c705-default-rtdb.firebaseio.com",
+    "project_id": "study-muffin-6c705",
+    "storage_bucket": "study-muffin-6c705.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170410199510:android:77690aba0f2b1af42cbc77",
+        "android_client_info": {
+          "package_name": "com.example.studymuffin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDat4ElBw-c0UJ4_6UpraCLvpHnnKNe1wM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170410199510:android:b3cc9c72bf4cdbfa2cbc77",
+        "android_client_info": {
+          "package_name": "com.mygdx.game"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDat4ElBw-c0UJ4_6UpraCLvpHnnKNe1wM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

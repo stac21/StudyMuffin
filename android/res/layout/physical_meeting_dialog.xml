@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/name_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/name_string"/>
+
+    <EditText
+        android:id="@+id/descriptionET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_et"
+        android:hint="@string/description_string" />
+
+    <TextView
+        android:id="@+id/classSpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/descriptionET"
+        android:text="Class"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+
+    <Spinner
+        android:id="@+id/classSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_toRightOf="@id/classSpinnerTextView"
+        android:layout_below="@id/descriptionET"
+        android:hint="CLass"/>
+
+    <TextView
+        android:id="@+id/daySpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/classSpinner"
+        android:text="@string/due_date"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/daySpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_below="@id/classSpinnerTextView"
+        android:layout_toRightOf="@id/daySpinnerTextView"
+        android:hint="@string/due_date"/>
+
+    <TextView
+        android:id="@+id/startTimeSpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/daySpinner"
+        android:text="@string/start_time"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/startTimeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/daySpinnerTextView"
+        android:layout_toEndOf="@id/startTimeSpinnerTextView"/>
+
+    <TextView
+        android:id="@+id/endTimeSpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/startTimeSpinnerTextView"
+        android:text="@string/end_time"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/endTimeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/startTimeSpinnerTextView"
+        android:layout_toEndOf="@id/endTimeSpinnerTextView"/>
+
+    <TextView
+        android:id="@+id/location_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/endTimeSpinnerTextView"
+        android:padding="10dp"
+        android:text="@string/location"
+        android:textSize="18sp" />
+    <EditText
+        android:id="@+id/location_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/endTimeSpinnerTextView"
+        android:layout_toEndOf="@id/endTimeSpinnerTextView" />
+
+    <TextView
+        android:id="@+id/calendar_checkbox_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/location_tv"
+        android:text="@string/notify"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <CheckBox
+        android:id="@+id/calendar_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/location_tv"
+        android:layout_toEndOf="@id/calendar_checkbox_tv"/>
+
+    <TextView
+        android:id="@+id/recurring_checkbox_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendar_checkbox_tv"
+        android:text="@string/recurring"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <CheckBox
+        android:id="@+id/recurring_cb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendar_checkbox_tv"
+        android:layout_toEndOf="@id/recurring_checkbox_tv"/>
+
+</RelativeLayout>

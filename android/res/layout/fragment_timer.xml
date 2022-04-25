@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/hours_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/separator_tv1"
+        android:textSize="60sp"
+        android:text="@string/timer_initial"
+        android:inputType="number"/>
+
+    <TextView
+        android:id="@+id/separator_tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/minutes_et"
+        android:textSize="60sp"
+        android:text="@string/separator_string"/>
+
+    <EditText
+        android:id="@+id/minutes_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="60sp"
+        android:text="@string/timer_initial"
+        android:inputType="number"/>
+
+    <TextView
+        android:id="@+id/separator_tv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/minutes_et"
+        android:textSize="60sp"
+        android:text="@string/separator_string"/>
+
+    <EditText
+        android:id="@+id/seconds_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/separator_tv2"
+        android:textSize="60sp"
+        android:text="@string/timer_initial"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/button_start_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/minutes_et"
+        android:layout_centerHorizontal="true"
+        android:text="@string/start_button"/>
+
+    <Button
+        android:id="@+id/button_reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_start_stop"
+        android:layout_centerHorizontal="true"
+        android:text="@string/reset_button"
+        android:visibility="invisible"/>
+
+</RelativeLayout>

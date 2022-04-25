@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/className"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="30dp"
+        android:padding="20dp"
+        android:text="CECS 328" />
+
+    <TextView
+        android:id="@+id/gradeTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text="Grade: 97.6%"
+        android:padding="5dp"
+        android:textSize="20dp"
+        android:layout_below="@id/classInstructor"/>
+
+    <TextView
+        android:id="@+id/classInstructor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Instructor: Neal Terrell"
+        android:textSize="20dp"
+        android:padding="5dp"
+        android:layout_below="@id/className"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/classRoom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Room: Engineering Center 330"
+        android:textSize="20dp"
+        android:padding="5dp"
+        android:layout_below="@id/gradeTV"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/classLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zoom link: https://csulb.zoom.us/j/86129125814"
+        android:textSize="20dp"
+        android:padding="5dp"
+        android:layout_below="@id/classRoom"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/classSchedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Schedule: Monday, Wednesday 3:30-4:45"
+        android:textSize="20dp"
+        android:padding="5dp"
+        android:layout_below="@id/classLink"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/classColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Color: "
+        android:textSize="20dp"
+        android:padding="5dp"
+        android:layout_below="@id/classSchedule"
+        android:layout_alignParentLeft="true"/>
+
+</RelativeLayout>
