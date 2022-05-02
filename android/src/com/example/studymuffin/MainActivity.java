@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem settingsItem = menu.findItem(R.id.settings_item);
         MenuItem filterItem = menu.findItem(R.id.filter_item);
         MenuItem filterDueDateItem = menu.findItem(R.id.sort_due_date_item);
+        MenuItem switchLayoutItem = menu.findItem(R.id.switch_layout_item);
 
         if (CalendarFragment.isCardSelected) {
             deleteItem.setVisible(true);
@@ -286,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             searchItem.setVisible(MainActivity.isInCalendarFragment);
             filterItem.setVisible(MainActivity.isInCalendarFragment);
+            switchLayoutItem.setVisible(MainActivity.isInCalendarFragment);
 
             calendarSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
@@ -294,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public boolean onClose() {
                     // set the recyclerview back to the full list of tasks rather than the filtered list
-                    ArrayList<Task> taskList = ClassFragment.getTasks(MainActivity.this);
+                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(MainActivity.this);
 
                     for (int i = 0; i < taskList.size(); i++) {
                         System.out.println(taskList.get(i).getName());

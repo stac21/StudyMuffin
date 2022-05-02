@@ -9,8 +9,9 @@ public abstract class Meeting extends Task {
 
     public Meeting(String name, String description, Date date, int startTimeHour,
                    int startTimeMinute, boolean notify, boolean recurring, int endTimeHour,
-                   int endTimeMinute, Priority priority, int courseId) {
-        super(name, description, date, startTimeHour, startTimeMinute, notify, priority, courseId);
+                   int endTimeMinute, Priority priority, int courseId, TaskType taskType) {
+        super(name, description, date, startTimeHour, startTimeMinute, notify, priority, courseId,
+                taskType);
 
         this.recurring = recurring;
         this.endTimeHour = endTimeHour;

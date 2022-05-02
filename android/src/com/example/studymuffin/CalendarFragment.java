@@ -31,6 +31,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -51,7 +54,7 @@ public class CalendarFragment extends Fragment {
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
 
-    public static final String TASK_FILE = "com.example.studymuffin.task_file";
+    public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
     public static final String SORT_PREFERENCE_FILE = "com.example.studymuffin.sort_preference";
     public static final String TASK_ID_COUNTER_FILE = "com.example.studymuffin.task_id_counter_file";
 
@@ -77,6 +80,7 @@ public class CalendarFragment extends Fragment {
 
         // TODO: save the tasks into the course list
         if (cardAdapter == null) {
+            System.out.println("CardAdapter is null");
             cardAdapter = new CalendarCardAdapter(loadTaskList(context));
         }
         Task.idCounter = loadTaskIdCounter(context);
@@ -376,7 +380,6 @@ public class CalendarFragment extends Fragment {
             this.notifyItemRangeChanged(0, this.getItemCount());
 
             saveTaskList(view.getContext(), this.taskList);
-            ClassFragment.addTaskToClass(view.getContext(), courseIndex, task);
         }
 
         public void removeCard() {
@@ -500,19 +503,51 @@ public class CalendarFragment extends Fragment {
         editor.apply();
     }
 
-
     public static ArrayList<Task> loadTaskList(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(TASK_FILE, null);
 
+        /*
         Type collectionType = new TypeToken<ArrayList<Task>>(){}.getType();
         ArrayList<Task> taskList = new Gson().fromJson(json, collectionType);
+         */
 
         if (MainActivity.userAccount != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         }
 
+        ArrayList<Task> taskList = new ArrayList<>();
+
+        // if the save file exists, load the data
+        if (json != null) {
+            Gson gson = new Gson();
+            JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
+            String currentElementJson;
+
+            System.out.println("JSONArray size = " + jsonArray.size());
+            for (int i = 0; i < jsonArray.size(); i++) {
+                currentElementJson = jsonArray.get(i).toString();
+
+                System.out.println(currentElementJson);
+
+                if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSIGNMENT.toString()
+                        + "\"")) {
+                    Assignment a = gson.fromJson(currentElementJson, Assignment.class);
+                    taskList.add(a);
+                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSESSMENT
+                        .toString() + "\"")) {
+                    Assessment a = gson.fromJson(currentElementJson, Assessment.class);
+                    taskList.add(a);
+                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.VIRTUAL_MEETING
+                        .toString() + "\"")) {
+                    VirtualMeeting vm = gson.fromJson(currentElementJson, VirtualMeeting.class);
+                    taskList.add(vm);
+                } else {
+                    PhysicalMeeting pm = gson.fromJson(currentElementJson, PhysicalMeeting.class);
+                    taskList.add(pm);
+                }
+            }
+        }
 
         return taskList;
     }

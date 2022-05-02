@@ -9,7 +9,7 @@ public class PhysicalMeeting extends Meeting {
                            int startTimeMinute, boolean notify, boolean recurring, int endTimeHour,
                            int endTimeMinute, String location, Priority priority, int courseId) {
         super(name, description, date, startTimeHour, startTimeMinute, notify, recurring, endTimeHour,
-                endTimeMinute, priority, courseId);
+                endTimeMinute, priority, courseId, TaskType.PHYSICAL_MEETING);
 
         this.location = location;
     }

@@ -15,9 +15,10 @@ public class Task {
     private int courseId;
     private int uniqueId;
     public static int idCounter;
+    private TaskType taskType;
 
     public Task(String name, String description, Date date, int startTimeHour, int startTimeMinute,
-                boolean notify, Priority priority, int courseId) {
+                boolean notify, Priority priority, int courseId, TaskType taskType) {
         this.name = name;
         this.description = description;
         this.date = date;
@@ -29,6 +30,7 @@ public class Task {
         this.courseId = courseId;
         // need to change this uniqueId to actually be unique
         this.uniqueId = idCounter++;
+        this.taskType = taskType;
     }
 
     public String getName() {

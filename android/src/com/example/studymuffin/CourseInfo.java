@@ -1,6 +1,9 @@
 package com.example.studymuffin;
 
+import android.content.Context;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class CourseInfo {
     private String title;
@@ -8,7 +11,6 @@ public class CourseInfo {
     private String classroom;
     private String zoomLink;
     private ArrayList<String> daysOfWeek;
-    private ArrayList<Task> taskList;
     private ArrayList<NoteInfo> noteList;
     private int startTimeHour;
     private int startTimeMinute;
@@ -31,7 +33,6 @@ public class CourseInfo {
         this.endTimeHour = endTimeHour;
         this.endTimeMinute = endTimeMinute;
         this.color = color;
-        this.taskList = new ArrayList<>();
         this.noteList = new ArrayList<>();
         this.uniqueId = idCounter++;
     }
@@ -52,41 +53,39 @@ public class CourseInfo {
         this.instructor = instructor;
     }
 
-    public void removeTask(Task task) {
-        Task currentTask = null;
-        int courseId = task.getCourseId();
-        String taskName = task.getName();
+    public float calculateClassGrade(Context context) {
+        float pointspossible = 0;
+        float pointsearned = 0;
 
-        for (int i = 0; i < this.taskList.size(); i++) {
-            currentTask = this.taskList.get(i);
+        ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
 
-            if (currentTask.getCourseId() == courseId &&
-                    currentTask.getName().equals(taskName)) {
-                this.taskList.remove(i);
-                break;
+        for (int i = 0; i < taskList.size(); i++) {
+            Task task = taskList.get(i);
+
+            // if the task belongs to this course, use it to calculate the grade
+            if (task.getCourseId() == this.uniqueId) {
+                if (task instanceof Assessment) {
+                    System.out.println("Instance of Assessment");
+
+                    Assessment a = (Assessment) taskList.get(i);
+                    pointspossible= pointspossible+ a.getPointsPossible();
+                    pointsearned= pointsearned+ a.getPointsEarned();
+                } else if (task instanceof Assignment) {
+                    System.out.println("Instance of Assignment");
+
+                    Assignment b = (Assignment) taskList.get(i);
+                    pointspossible = pointspossible + b.getPointsPossible();
+                    pointsearned = pointsearned + b.getPointsEarned();
+                } else {
+                    System.out.println("Still registering as a task");
+                }
             }
         }
-    }
-/*
-    public float calculateClassGrade () {
-        float pointspossible=0;
-        float pointsearned=0;
-        for (int i = 0; i < taskList.size(); i++){
-            pointspossible= pointspossible+ taskList(i).get
 
+        System.out.println(pointsearned);
+        System.out.println(pointspossible);
 
-
-        }
-
-        }
-*/
-
-    public ArrayList<Task> getTaskList() {
-        return taskList;
-    }
-
-    public void addTask(Task task) {
-        this.taskList.add(task);
+        return pointsearned / pointspossible;
     }
 
     public int getStartTimeHour() {

@@ -114,6 +114,10 @@
     <string name="edit_item">Edit</string>
     <string name="clear_selection_item">Clear Selection</string>
     <string name="clear_search_item">Clear Search</string>
+    <string name="switch_layout_item">Switch Layout</string>
+    <string name="monthly_layout_item">Monthly Layout</string>
+    <string name="weekly_layout_item">Weekly Layout</string>
+    <string name="todo_list_item">Todo List</string>
 
     <!-- Menu Task Titles -->
     <string name="save_item">Save</string>

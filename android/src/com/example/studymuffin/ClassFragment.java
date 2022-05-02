@@ -40,6 +40,7 @@ public class ClassFragment extends Fragment {
 
     public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
+    public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
 
     @Nullable
     @Override
@@ -158,6 +159,10 @@ public class ClassFragment extends Fragment {
             Toast.makeText(v.getContext(), "Card Clicked", Toast.LENGTH_SHORT).show();
 
             Intent i = new Intent(v.getContext(), CourseActivity.class);
+            CourseInfo course = cardAdapter.getCourse(this.getLayoutPosition());
+            selectedCardPosition = this.getAdapterPosition();
+
+            i.putExtra(COURSE_INTENT, new Gson().toJson(course));
 
             v.getContext().startActivity(i);
         }
@@ -254,7 +259,7 @@ public class ClassFragment extends Fragment {
         if (courseList != null) {
             return courseList;
         } else {
-            return new ArrayList<CourseInfo>();
+            return new ArrayList<>();
         }
     }
 
@@ -275,45 +280,6 @@ public class ClassFragment extends Fragment {
         CourseInfo ci = courseList.get(courseIndex);
 
         return ci;
-    }
-
-    public static void addTaskToClass(Context context, int courseIndex, Task task) {
-        ArrayList<CourseInfo> courseList = loadCourseList(context);
-        CourseInfo ci = courseList.get(courseIndex);
-        System.out.println("Course name: " + ci.getTitle());
-        courseList.get(courseIndex).addTask(task);
-
-        saveCourseList(context, courseList);
-    }
-
-    public static void setClassTaskList(Context context, Task task) {
-        ArrayList<CourseInfo> courseList = loadCourseList(context);
-        int courseId = task.getCourseId();
-        System.out.println(courseId);
-        CourseInfo ci = null;
-
-        for (int i = 0; i < courseList.size(); i++) {
-            if (courseList.get(i).getUniqueId() == courseId) {
-                System.out.println("The matching course is " + courseList.get(i).getTitle());
-                ci = courseList.get(i);
-            }
-        }
-
-        if (ci != null) {
-            ci.removeTask(task);
-            saveCourseList(context, courseList);
-        }
-    }
-
-    public static ArrayList<Task> getTasks(Context context) {
-        ArrayList<CourseInfo> courseList = loadCourseList(context);
-        ArrayList<Task> taskList = new ArrayList<>();
-
-        for (int i = 0; i < courseList.size(); i++) {
-            taskList.addAll(courseList.get(i).getTaskList());
-        }
-
-        return taskList;
     }
 
     public static ArrayList<NoteInfo> getNotes(Context context) {
