@@ -116,6 +116,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.3.0')
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'com.google.firebase:firebase-database:19.2.0'
+    implementation 'com.github.alamkanak:android-week-view:1.2.6'
 }
 
 eclipse.project.name = appName + "-android"

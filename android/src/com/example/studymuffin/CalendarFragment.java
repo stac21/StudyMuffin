@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alamkanak.weekview.WeekView;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -53,6 +54,7 @@ public class CalendarFragment extends Fragment {
     public static boolean isCardSelected = false;
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
+    public static WeekView mWeekView;
 
     public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
     public static final String SORT_PREFERENCE_FILE = "com.example.studymuffin.sort_preference";
@@ -71,6 +73,9 @@ public class CalendarFragment extends Fragment {
 
         if (monthlyCalendarView == null) {
             monthlyCalendarView = view.findViewById(R.id.compact_calendar_view);
+        }
+        if(mWeekView == null) {
+            mWeekView = view.findViewById((R.id.weekView));
         }
         if (sortPreference == null) {
             System.out.println("sortPreference is null");
@@ -105,6 +110,10 @@ public class CalendarFragment extends Fragment {
 
         monthLabel.setText(months[currentMonth]);
         populateCalendar(cardAdapter.getTaskList());
+
+        // Get a reference for the week view in the layout.
+        //mWeekView = view.findViewById(R.id.weekView);
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
