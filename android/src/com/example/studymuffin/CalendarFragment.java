@@ -54,6 +54,8 @@ public class CalendarFragment extends Fragment {
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
 
+    public static Profile profile = MainActivity.profile;
+
     public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
     public static final String SORT_PREFERENCE_FILE = "com.example.studymuffin.sort_preference";
     public static final String TASK_ID_COUNTER_FILE = "com.example.studymuffin.task_id_counter_file";

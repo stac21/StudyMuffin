@@ -13,13 +13,15 @@ import java.lang.reflect.Type;
 public class Profile {
     private String firstName;
     private String lastName;
-    private int numPoints;
+    private int numStudyPoints;
+    private int numBakeryMoney;
     public static String PROFILE_FILE = "com.example.studymuffin.profile";
 
-    public Profile(String firstName, String lastName, int numPoints) {
+    public Profile(String firstName, String lastName, int numStudyPoints, int numBakeryMoney) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.numPoints = numPoints;
+        this.numStudyPoints = numStudyPoints;
+        this.numBakeryMoney = numBakeryMoney;
     }
 
     public String getFirstName() {
@@ -39,15 +41,27 @@ public class Profile {
     }
 
     public int getNumPoints() {
-        return numPoints;
+        return numStudyPoints;
     }
 
-    public void addPoints(int numPoints) {
-        this.numPoints += numPoints;
+    public void addPoints(int numStudyPoints) {
+        this.numStudyPoints += numStudyPoints;
     }
 
-    public void substractPoints(int numPoints) {
-        this.numPoints -= numPoints;
+    public void substractPoints(int numStudyPoints) {
+        this.numStudyPoints -= numStudyPoints;
+    }
+
+    public int getnumBakeryMoney() {
+        return numBakeryMoney;
+    }
+
+    public void addBakeryMoney(int numBakeryMoney) {
+        this.numBakeryMoney += numBakeryMoney;
+    }
+
+    public void substractBakeryMoney(int numBakeryMoney) {
+        this.numBakeryMoney -= numBakeryMoney;
     }
 
     /**

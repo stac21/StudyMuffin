@@ -31,7 +31,7 @@ public class MyTimer {
         this.isPaused = false;
         this.isFinished = true;
         this.isExited = false;
-        this.profile = new Profile("Dave", "Smith", 0);
+        this.profile = new Profile("Dave", "Smith", 0, 0);
     }
 
     public void start() {

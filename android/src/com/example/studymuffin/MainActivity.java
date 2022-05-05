@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static SearchView calendarSearchView;
     public static Account userAccount;
     private FirebaseAuth mAuth;
+    public static Profile profile = new Profile("Profile", "One", 0, 0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
