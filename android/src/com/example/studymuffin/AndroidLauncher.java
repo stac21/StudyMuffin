@@ -39,7 +39,7 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 		private static BakeryDemo demo;
 		private View view;
 		public static String MONEY_FILE = "com.example.studymuffin.money_file";
-		public static String UPGRADES_FILE = "com.example.studymuffin.new_upgrades_file";
+		public static String UPGRADES_FILE = "com.example.studymuffin.upgrades_file";
 		FirebaseDatabase database;
 		DatabaseReference moneyRef;
 
@@ -78,7 +78,7 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 
 			String json = new Gson().toJson(BakeryDemo.upgrades);
 
-			editor.putInt(MONEY_FILE, demo.getMoney());
+			editor.putFloat(MONEY_FILE, demo.getMoney());
 			editor.putString(UPGRADES_FILE, json);
 
 			editor.apply();
@@ -93,7 +93,8 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 			System.out.println("OnResume called");
 
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.view.getContext());
-			int money = sp.getInt(MONEY_FILE, 0);
+
+			float money = sp.getFloat(MONEY_FILE, 0.0f);
 			String json = sp.getString(UPGRADES_FILE, null);
 
 			demo.setMoney(money);

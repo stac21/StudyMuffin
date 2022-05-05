@@ -113,6 +113,10 @@ public class Task {
         idCounter = mIdCounter;
     }
 
+    public TaskType getTaskType() {
+        return this.taskType;
+    }
+
     /**
      * compares two tasks by the attribute the user selected in their sort preference, found in
      * CalendarFragment

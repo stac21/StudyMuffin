@@ -1,5 +1,7 @@
 package com.example.studymuffin;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -7,17 +9,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +33,7 @@ public class TaskActivity extends AppCompatActivity {
     private TextView priorityTv;
     private Spinner prioritySpinner;
     private CheckBox completedCb;
+    private TextView taskTypeTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +41,16 @@ public class TaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task);
         Resources r = this.getResources();
 
+        final Context context = TaskActivity.this;
+
         // get the task information from the CalendarFragment's intent
         Intent i = this.getIntent();
         String json = i.getStringExtra("com.example.studymuffin.task");
-        Type collectionType = new TypeToken<Task>(){}.getType();
-        Task task = new Gson().fromJson(json, collectionType);
+        final Task task = CalendarFragment.convertJsonToTask(json);
 
         this.nameEt = this.findViewById(R.id.name_et);
         this.descriptionEt = this.findViewById(R.id.description_et);
+        this.taskTypeTv = this.findViewById(R.id.task_type_tv);
         this.dateTv = this.findViewById(R.id.date_tv);
         this.startTimeTv = this.findViewById(R.id.start_time_tv);
         this.notifyCb = this.findViewById(R.id.notify_cb);
@@ -55,6 +60,8 @@ public class TaskActivity extends AppCompatActivity {
 
         this.nameEt.setText(task.getName());
         this.descriptionEt.setText(task.getDescription());
+        this.taskTypeTv.setText(this.taskTypeTv.getText().toString() + ": " +
+                task.getTaskType().toString());
         // sets the date and trims it to only contain the day of week and date
         this.dateTv.setText(this.trimDateStr(task.getDate()));
         this.startTimeTv.setText(this.getAmPmFormat(task.getStartTimeHour(), task.getStartTimeMinute()));
@@ -62,6 +69,98 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
         this.completedCb.setChecked(task.isCompleted());
+
+        this.notifyCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                task.setNotify(isChecked);
+            }
+        });
+
+        if (task instanceof Assignment || task instanceof Assessment) {
+            completedCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        View v = getLayoutInflater().inflate(R.layout.checked_dialog, null);
+
+                        final EditText pointsEarnedEt = v.findViewById(R.id.points_earned_et);
+
+                        builder.setTitle(R.string.add_points);
+                        builder.setView(v);
+                        builder.setCancelable(true);
+
+                        builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.setTitle(R.string.add_points);
+                        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+                                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                positiveButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        String pointsEarnedStr = pointsEarnedEt.getText().toString();
+
+                                        if (pointsEarnedStr.length() != 0) {
+                                            float points = Float.parseFloat(pointsEarnedStr);
+
+                                            if (task instanceof Assignment) {
+                                                Assignment a = (Assignment) task;
+
+                                                if (points <= a.getPointsPossible()) {
+                                                    a.setPointsEarned(points);
+
+                                                    CalendarFragment.saveTask(context, a);
+
+                                                    dialog.dismiss();
+                                                } else {
+                                                    Toast.makeText(context,
+                                                            R.string.points_earned_greater,
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            } else {
+                                                Assessment a = (Assessment) task;
+
+                                                if (points <= a.getPointsPossible()) {
+                                                    a.setPointsEarned(points);
+
+                                                    CalendarFragment.saveTask(context, a);
+
+                                                    dialog.dismiss();
+                                                } else {
+                                                    Toast.makeText(context,
+                                                            R.string.points_earned_greater,
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(context, R.string.empty_points_earned,
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        dialog.show();
+                    }
+                }
+            });
+        }
 
         // set up the priority spinner
         final String[] priorities = r.getStringArray(R.array.priority_array);
@@ -101,20 +200,24 @@ public class TaskActivity extends AppCompatActivity {
         return df.format(date);
     }
 
-    private String getAmPmFormat(int hour, int minute) {
+    /**
+     * turns the hour and minute to AM PM time format
+     * @param hour the hour
+     * @param minute the minute
+     * @return a string representation of the time in AM PM format
+     */
+    public static String getAmPmFormat(int hour, int minute) {
         String time = "";
-        // the hour passed in is in 24 hour format so convert the hour to am pm format
-        // TODO fix bug where the hour doesn't display when the hour is 12
+
         int convertedHour = (hour > 12) ? hour - 12 : hour;
 
-        if (convertedHour < 10) {
-            time += "0" + convertedHour;
-        }
-
+        time += convertedHour;
         time += ":";
 
         if (minute < 10) {
             time += "0" + minute;
+        } else {
+            time += minute;
         }
 
         time += (hour < 12) ? " AM" : " PM";
