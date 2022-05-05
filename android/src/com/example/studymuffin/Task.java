@@ -1,5 +1,6 @@
 package com.example.studymuffin;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 // needed to make this not abstract so that the saving/loading to/from json would work
@@ -12,13 +13,10 @@ public class Task {
     private boolean completed;
     private boolean notify;
     private Priority priority;
-    private int courseId;
-    private int uniqueId;
-    public static int idCounter;
-    private TaskType taskType;
+    private ArrayList<Goal> goals;
 
     public Task(String name, String description, Date date, int startTimeHour, int startTimeMinute,
-                boolean notify, Priority priority, int courseId, TaskType taskType) {
+                boolean notify, Priority priority) {
         this.name = name;
         this.description = description;
         this.date = date;
@@ -27,10 +25,7 @@ public class Task {
         this.completed = false;
         this.notify = notify;
         this.priority = priority;
-        this.courseId = courseId;
-        // need to change this uniqueId to actually be unique
-        this.uniqueId = idCounter++;
-        this.taskType = taskType;
+        goals = new ArrayList<>();
     }
 
     public String getName() {
@@ -81,7 +76,7 @@ public class Task {
         this.completed = completed;
     }
 
-    public boolean shouldNotify() {
+    public boolean isNotify() {
         return notify;
     }
 
@@ -97,42 +92,7 @@ public class Task {
         this.priority = priority;
     }
 
-    public int getCourseId() {
-        return courseId;
-    }
+    public ArrayList<Goal> getGoals() { return goals; }
 
-    public int getUniqueId() {
-        return this.uniqueId;
-    }
-
-    public int getIdCounter() {
-        return idCounter;
-    }
-
-    public void setIdCounter(int mIdCounter) {
-        idCounter = mIdCounter;
-    }
-
-    /**
-     * compares two tasks by the attribute the user selected in their sort preference, found in
-     * CalendarFragment
-     * @param other the task to compare this task to
-     * @return 0 if equal, < 0 if this task is less than other, > 0 if this task is greater than other
-     */
-    public int compareToByPreference(Task other) {
-        if (other == null) {
-            return 1;
-        }
-
-        switch (CalendarFragment.sortPreference) {
-            case DUE_DATE:
-                return this.date.compareTo(other.getDate());
-            case PRIORITY:
-                return this.priority.compareTo(other.getPriority());
-            default:
-                // this branch should never be selected. Only here to ensure the function returns
-                // from all paths
-                return 1;
-        }
-    }
+    public void setGoals(ArrayList<Goal> goals) { this.goals = goals; }
 }

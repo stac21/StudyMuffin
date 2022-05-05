@@ -24,8 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,13 +32,11 @@ import java.util.ArrayList;
 
 public class ClassFragment extends Fragment {
     private View view;
-    public static CardAdapter cardAdapter;
+    private CardAdapter cardAdapter;
     public static int selectedCardPosition;
     public static boolean isCardSelected = false;
 
-    public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
-    public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
-    public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
+    public static final String COURSE_FILE = "com.example.studymuffin.course_file";
 
     @Nullable
     @Override
@@ -48,11 +44,8 @@ public class ClassFragment extends Fragment {
         this.view = inflater.inflate(R.layout.fragment_class_list, container, false);
         Context context = this.view.getContext();
 
-        if (cardAdapter == null) {
-            cardAdapter = new CardAdapter(loadCourseList(context));
-        }
-
-        CourseInfo.idCounter = loadCourseIdCounter(context);
+        ArrayList<CourseInfo> list = loadCourseList(context);
+        this.cardAdapter = new CardAdapter(list);
 
         this.makeRecyclerView();
 
@@ -113,9 +106,10 @@ public class ClassFragment extends Fragment {
                                     String lastName = instructor.substring(
                                             instructor.indexOf(" ") + 1);
 
-                                    cardAdapter.addCard(name, new Instructor(firstName, lastName),
-                                            location, link, new ArrayList<String>(), 0,
-                                            0, 0, 0, Color.RED);
+                                    cardAdapter.addCard(nameEt.getText().toString(),
+                                            new Instructor(firstName, lastName), location, link,
+                                            new ArrayList<String>(), 0, 0,
+                                            0, 0, Color.RED);
 
                                     alertDialog.dismiss();
                                 }
@@ -159,10 +153,6 @@ public class ClassFragment extends Fragment {
             Toast.makeText(v.getContext(), "Card Clicked", Toast.LENGTH_SHORT).show();
 
             Intent i = new Intent(v.getContext(), CourseActivity.class);
-            CourseInfo course = cardAdapter.getCourse(this.getLayoutPosition());
-            selectedCardPosition = this.getAdapterPosition();
-
-            i.putExtra(COURSE_INTENT, new Gson().toJson(course));
 
             v.getContext().startActivity(i);
         }
@@ -240,27 +230,12 @@ public class ClassFragment extends Fragment {
     }
 
     public static ArrayList<CourseInfo> loadCourseList(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String json = sp.getString(COURSE_FILE, null);
+
         Type collectionType = new TypeToken<ArrayList<CourseInfo>>(){}.getType();
-        ArrayList<CourseInfo> courseList = new ArrayList<>();
 
-        if (MainActivity.userAccount != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
-
-        } else {
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-            String json = sp.getString(COURSE_FILE, null);
-
-            courseList = new Gson().fromJson(json, collectionType);
-        }
-
-        if (courseList != null) {
-            return courseList;
-        } else {
-            return new ArrayList<>();
-        }
+        return new Gson().fromJson(json, collectionType);
     }
 
     public static void saveCourseList(Context context, ArrayList<CourseInfo> courseList) {
@@ -270,37 +245,16 @@ public class ClassFragment extends Fragment {
         String json = new Gson().toJson(courseList);
 
         editor.putString(COURSE_FILE, json);
-        editor.putInt(COURSE_ID_COUNTER_FILE, CourseInfo.idCounter);
 
         editor.apply();
     }
 
-    public static CourseInfo getCourseAtIndex(Context context, int courseIndex) {
+    public static void addTaskToClass(Context context, int courseIndex, Task task) {
         ArrayList<CourseInfo> courseList = loadCourseList(context);
         CourseInfo ci = courseList.get(courseIndex);
+        System.out.println("Course name: " + ci.getTitle());
+        courseList.get(courseIndex).addTask(task);
 
-        return ci;
-    }
-
-    public static ArrayList<NoteInfo> getNotes(Context context) {
-        ArrayList<CourseInfo> courseList = loadCourseList(context);
-        ArrayList<NoteInfo> noteList = new ArrayList<>();
-
-        for (int i = 0; i < courseList.size(); i++) {
-            noteList.addAll(courseList.get(i).getNoteList());
-        }
-
-        return noteList;
-    }
-
-    /**
-     * load the idCounter for courses
-     * @param context the application's context
-     * @return the idCounter for courses, 0 if it hasn't been initialized yet
-     */
-    public static int loadCourseIdCounter(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-
-        return sp.getInt(COURSE_ID_COUNTER_FILE, 0);
+        saveCourseList(context, courseList);
     }
 }

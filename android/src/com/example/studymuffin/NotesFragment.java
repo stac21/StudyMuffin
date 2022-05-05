@@ -1,12 +1,9 @@
 package com.example.studymuffin;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,84 +25,32 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class NotesFragment extends Fragment {
-    private  View view;
+    private View view;
     private CardAdapter cardAdapter;
-    private ArrayList<NoteInfo> list;
-    private Set<String> titleList;
-    private String userName;
-    SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
-    public static final String NOTES_FILE = "com.example.studymuffin.notes_file";
-
-    public NotesFragment() {
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        list = new ArrayList<>();
-        titleList = new HashSet<>();
-        //mAuth = FirebaseAuth.getInstance();
-        //userName = mAuth.getCurrentUser().toString();
-        userName = "sarita.chap@gmail.com";
-
-        sharedpreferences = this.getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-
-
-        //Get stored list of titles
-        titleList.addAll(sharedpreferences.getStringSet("key", titleList));
-        //titleList = sharedpreferences.getStringSet("key", titleList);
-
-        //list.add(new NoteInfo("Hello", 4, 1));
-        //titleList.add("Hello");
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-        if (MainActivity.userAccount != null) {
-            ArrayList<String> titleArray
-                    = new ArrayList<>();
-            titleArray.addAll(titleList);
-
-            //go through stored string set and add notes to list
-            for (int j = 0; j < titleArray.size(); j++) {
-                list.add(new NoteInfo(titleArray.get(j), sharedpreferences.getInt(titleArray.get(j) + "month", 1),
-                        sharedpreferences.getInt(titleArray.get(j) + "day", 1)));
-            }
-        } else {
-            list = loadLocalNoteList(getContext());
-        }
-
-        //list.add(new NoteInfo("Binary Search", 9, 12));
+        ArrayList<NoteInfo> list = new ArrayList<>();
+        list.add(new NoteInfo("Binary Search", 9, 12));
 
         this.cardAdapter = new CardAdapter(list);
         this.view = inflater.inflate(R.layout.fragment_notes, container, false);
         this.makeRecyclerView();
 
-        ArrayList<CourseInfo> courseList = ClassFragment.loadCourseList(getContext());
-
-        final String[] courseNamesArr = new String[courseList.size()];
-
-        for (int i = 0; i < courseNamesArr.length; i++) {
-            courseNamesArr[i] = courseList.get(i).getTitle();
-        }
+        final String[] classes = {
+                "CECS 327",
+                "CECS 491"
+        };
 
         FloatingActionButton fab = this.view.findViewById(R.id.floatingActionButton);
 
-        //Add new note button
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,7 +63,7 @@ public class NotesFragment extends Fragment {
 
                 Spinner classSpinner = (Spinner) v.findViewById(R.id.classSpinner);
                 classSpinner.setAdapter(new ArrayAdapter<String>(view.getContext(),
-                        android.R.layout.simple_spinner_dropdown_item, courseNamesArr));
+                        android.R.layout.simple_spinner_dropdown_item, classes));
 
                 classSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
@@ -154,6 +99,7 @@ public class NotesFragment extends Fragment {
                 dialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                     }
                 });
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -171,35 +117,7 @@ public class NotesFragment extends Fragment {
                         button.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                dialog.cancel();
-                                LocalDate date = LocalDate.now();
-                                int month = date.getMonth().getValue();
-                                int day = date.getDayOfMonth();
-                                int year = date.getYear();
-                                cardAdapter.addCard(nameET.getText().toString(), month, day);
 
-                                //Saving Note Card Titles
-                                titleList.add(nameET.getText().toString());
-                                editor.putStringSet("key", titleList);
-                                editor.putInt(nameET.getText().toString() + "month", month);
-                                editor.putInt(nameET.getText().toString() + "day", day);
-                                editor.commit();
-
-                                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                Map<String, Object> docData = new HashMap<>();
-                                docData.put("NoteTitle", nameET.getText().toString());
-                                docData.put("NoteText", "");
-                                docData.put("Month", month);
-                                docData.put("Day", day);
-                                docData.put("Year", year);
-
-                                //Get account name
-                                //replace account name in collection path
-                                //document path is titleKey
-                                db.collection("Data").document("NoteData")
-                                        .collection(userName).document(nameET.getText().toString()).set(docData);
-
-                                makeRecyclerView();
                             }
                         });
                     }
@@ -212,49 +130,18 @@ public class NotesFragment extends Fragment {
         return this.view;
     }
 
-    @Override
-    public void onResume() {
-        Toast.makeText(getView().getContext(), "Hi", Toast.LENGTH_LONG).show();
-        super.onResume();
-        list = new ArrayList<>();
-        titleList = new HashSet<>();
-
-        sharedpreferences = this.getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-
-        //Get stored list of titles
-        titleList.addAll(sharedpreferences.getStringSet("key", titleList));
-
-        ArrayList<String> titleArray
-                = new ArrayList<>();
-        titleArray.addAll(titleList);
-
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-        //go through stored string set and add notes to list
-        for(int j = 0; j < titleArray.size(); j++){
-            list.add(new NoteInfo(titleArray.get(j), sharedpreferences.getInt(titleArray.get(j) + "month", 1),
-                    sharedpreferences.getInt(titleArray.get(j) + "day", 1)));
-        }
-
-        //list.add(new NoteInfo("Binary Search", 9, 12));
-
-        this.cardAdapter = new CardAdapter(list);
-        makeRecyclerView();
-    }
-
     public void makeRecyclerView() {
-        RecyclerView recyclerView = this.view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = this.view.findViewById(R.id.recyclerviewNotes);
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager llm = new LinearLayoutManager(this.getContext());
         recyclerView.setLayoutManager(llm);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
         recyclerView.setAdapter(this.cardAdapter);
     }
 
     public class CardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,
             View.OnClickListener {
-        public TextView titleTextView, dateTextView;
-        public String titleString;
+        protected TextView titleTextView, dateTextView;
 
         public CardViewHolder(View v) {
             super(v);
@@ -262,20 +149,15 @@ public class NotesFragment extends Fragment {
             this.titleTextView = (TextView) v.findViewById(R.id.titleTextView);
             this.dateTextView = (TextView) v.findViewById(R.id.dateTextView);
 
-
             v.setOnLongClickListener(this);
             v.setOnClickListener(this);
         }
 
-
-        //Access Note by clicking on the note card
         @Override
         public void onClick(View v) {
             Toast.makeText(v.getContext(), "Card Clicked", Toast.LENGTH_SHORT).show();
 
             Intent i = new Intent(v.getContext(), NoteActivity.class);
-            this.titleString = titleTextView.getText().toString();
-            i.putExtra("com.example.studymuffin.NotesFragment", titleString);
 
             v.getContext().startActivity(i);
         }
@@ -329,45 +211,5 @@ public class NotesFragment extends Fragment {
 
             this.noteInfoList.add(noteInfo);
         }
-
-        public void removeCard(String title, int month, int day) {
-            NoteInfo noteInfo = new NoteInfo(title, month, day);
-
-            this.noteInfoList.remove(noteInfo);
-        }
-    }
-
-    /**
-     * load the notes from local storage
-     * @param context the application's context
-     * @return
-     */
-    public static ArrayList<NoteInfo> loadLocalNoteList(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        String json = sp.getString(NOTES_FILE, null);
-
-        Type collectionType = new TypeToken<ArrayList<NoteInfo>>(){}.getType();
-        ArrayList<NoteInfo> noteList = new Gson().fromJson(json, collectionType);
-
-        if (noteList != null) {
-            return noteList;
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
-    /**
-     * save the note list to local storage
-     * @param context the application's context
-     */
-    public static void saveNoteList(Context context, ArrayList<NoteInfo> notesList) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = sp.edit();
-
-        String json = new Gson().toJson(notesList);
-
-        editor.putString(NOTES_FILE, json);
-
-        editor.apply();
     }
 }

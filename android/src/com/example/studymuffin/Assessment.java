@@ -10,9 +10,8 @@ public class Assessment extends Task {
 
     public Assessment(String name, String description, Date date, int startTimeHour,
                       int startTimeMinute, boolean notify, float pointsPossible, int endTimeHour,
-                      int endTimeMinute, Priority priority, int courseId) {
-        super(name, description, date, startTimeHour, startTimeMinute, notify, priority, courseId,
-                TaskType.ASSESSMENT);
+                      int endTimeMinute, Priority priority) {
+        super(name, description, date, startTimeHour, startTimeMinute, notify, priority);
 
         this.pointsPossible = pointsPossible;
         this.endTimeHour = endTimeHour;

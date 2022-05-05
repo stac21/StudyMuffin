@@ -14,7 +14,7 @@ public class Profile {
     private String firstName;
     private String lastName;
     private int numPoints;
-    public static String PROFILE_FILE = "com.example.studymuffin.profile";
+    public static String DATA_FILE = "com.example.studymuffin.profile";
 
     public Profile(String firstName, String lastName, int numPoints) {
         this.firstName = firstName;
@@ -57,7 +57,7 @@ public class Profile {
      */
     public Profile loadProfile(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        String json = sp.getString(PROFILE_FILE, null);
+        String json = sp.getString(DATA_FILE, null);
 
         Type collectionType = new TypeToken<Profile>(){}.getType();
 
@@ -77,7 +77,7 @@ public class Profile {
 
         String json = new Gson().toJson(profile);
 
-        editor.putString(PROFILE_FILE, json);
+        editor.putString(DATA_FILE, json);
 
         editor.apply();
 

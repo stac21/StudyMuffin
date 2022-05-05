@@ -7,9 +7,9 @@ public class VirtualMeeting extends Meeting {
 
     public VirtualMeeting(String name, String description, Date date, int startTimeHour,
                           int startTimeMinute, boolean notify, boolean recurring, int endTimeHour,
-                          int endTimeMinute, String link, Priority priority, int courseId) {
+                          int endTimeMinute, String link, Priority priority) {
         super(name, description, date, startTimeHour, startTimeMinute, notify, recurring, endTimeHour,
-                endTimeMinute, priority, courseId, TaskType.VIRTUAL_MEETING);
+                endTimeMinute, priority);
 
         this.link = link;
     }

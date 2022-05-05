@@ -1,11 +1,10 @@
 package com.example.studymuffin;
 
 public class NoteInfo {
-    public String title;
-    public String description;
-    public int monthEdited;
-    public int dayEdited;
-    public String className;
+    private String title;
+    private String description;
+    private int monthEdited;
+    private int dayEdited;
 
     public NoteInfo(String title, int monthEdited, int dayEdited) {
         this.title = title;
@@ -45,10 +44,6 @@ public class NoteInfo {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public String getClassName(){return className;}
-
-    public void setClassName(String className){ this.className = className;}
 
     private String getMonthString() {
         switch (this.monthEdited) {

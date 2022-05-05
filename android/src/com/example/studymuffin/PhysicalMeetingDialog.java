@@ -206,17 +206,18 @@ public class PhysicalMeetingDialog {
                             Task task = new PhysicalMeeting(name, description, selectedDate,
                                     selectedStartHour, selectedStartMinute, notifyCB.isChecked(),
                                     recurringCB.isSelected(), selectedEndHour, selectedEndMinute,
-                                    locationStr, priority, ClassFragment.getCourseAtIndex(context,
-                                    selectedClassIndex).getUniqueId());
+                                    locationStr, priority);
 
                             Toast.makeText(context, "Task created", Toast.LENGTH_SHORT).show();
 
                             // TODO: add the task to the selected course
                             CalendarFragment.addTaskToCalendar(task);
 
-                            CalendarFragment.cardAdapter.addCard(task, selectedClassIndex);
+                            CalendarFragment.cardAdapter.addCard(task);
 
-                            MyNotification.registerAlarm(context, task);
+                            ClassFragment.addTaskToClass(context, selectedClassIndex, task);
+
+                            new MyNotification(context, task);
 
                             dialog.dismiss();
                         } else {

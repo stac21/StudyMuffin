@@ -8,9 +8,8 @@ public class Assignment extends Task {
 
     public Assignment(String name, String description, Date date, int startTimeHour,
                       int startTimeMinute, boolean notify, float pointsPossible,
-                      Priority priority, int courseId) {
-        super(name, description, date, startTimeHour, startTimeMinute, notify, priority, courseId,
-                TaskType.ASSIGNMENT);
+                      Priority priority) {
+        super(name, description, date, startTimeHour, startTimeMinute, notify, priority);
 
         this.pointsPossible = pointsPossible;
     }

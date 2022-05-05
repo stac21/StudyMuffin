@@ -189,28 +189,23 @@ public class AssignmentDialog {
                         String description = descriptionET.getText().toString();
                         String pointsStr = pointsET.getText().toString();
 
-                        System.out.println("Name: " + name);
-                        System.out.println("Desc: " + description);
-                        System.out.println("points: " + pointsStr);
-
                         Context context = fView.getContext();
 
-                        if (name.length() != 0 && description.length() != 0 &&
-                                pointsStr.length() != 0) {
+                        if (name.length() != 0 && description.length() != 0 && pointsStr != null) {
                             task = new Assignment(name, description, selectedDate,
                                     selectedHour, selectedMinute, notifyCB.isChecked(),
-                                    Integer.parseInt(pointsStr), priority,
-                                    ClassFragment.getCourseAtIndex(context, selectedClassIndex)
-                                            .getUniqueId());
+                                    Integer.parseInt(pointsStr), priority);
 
                             Toast.makeText(context, "Task created", Toast.LENGTH_SHORT).show();
 
                             // TODO: add the task to the selected course
                             CalendarFragment.addTaskToCalendar(task);
 
-                            CalendarFragment.cardAdapter.addCard(task, selectedClassIndex);
+                            CalendarFragment.cardAdapter.addCard(task);
 
-                            MyNotification.registerAlarm(context, task);
+                            ClassFragment.addTaskToClass(context, selectedClassIndex, task);
+
+                            new MyNotification(context, task);
 
                             dialog.dismiss();
                         } else {
