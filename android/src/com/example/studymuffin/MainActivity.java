@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,10 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -38,12 +42,15 @@ public class MainActivity extends AppCompatActivity {
     // keeps track of the current fragment that the user is on. 0 is for the sign in page.
     public static final int SIGN_IN_PAGE = 0;
     public static int currentFragment = SIGN_IN_PAGE;
-    public static boolean isSearchEnabled = false;
+    public static boolean isInCalendarFragment = false;
     public static SearchView calendarSearchView;
+    public static Account userAccount;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SettingsActivity.setThemeOfApp(this);
         setContentView(R.layout.activity_main);
 
         loadFragment(currentFragment);
@@ -62,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
         final EditText firstName = this.findViewById(R.id.firstName);
         final EditText lastName = this.findViewById(R.id.lastName);
         final TextView incorrectUsernamePassword = this.findViewById(R.id.incorrectUsernamePassword);
+
+        mAuth = FirebaseAuth.getInstance();
+        userAccount = Account.loadAccount(MainActivity.this);
 
         if (currentFragment != SIGN_IN_PAGE) {
             bottomNav.setVisibility(View.VISIBLE);
@@ -117,6 +127,24 @@ public class MainActivity extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String email = emailET.getText().toString();
+                String password = passwordET.getText().toString();
+
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                                if(task.isSuccessful()){
+                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                    // save the account information locally
+                                    userAccount = new Account(email, password);
+                                    userAccount.save(MainActivity.this);
+                                } else {
+                                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
                 confirmPasswordET.setVisibility(View.INVISIBLE);
                 createAccountButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
@@ -197,14 +225,14 @@ public class MainActivity extends AppCompatActivity {
         Fragment selectedFragment = null;
         currentFragment = itemId;
 
-        if (MainActivity.isSearchEnabled) {
-            MainActivity.isSearchEnabled = false;
+        if (MainActivity.isInCalendarFragment) {
+            MainActivity.isInCalendarFragment = false;
             MainActivity.this.invalidateOptionsMenu();
         }
 
         switch (itemId) {
             case R.id.nav_calendar:
-                MainActivity.isSearchEnabled = true;
+                MainActivity.isInCalendarFragment = true;
                 MainActivity.this.invalidateOptionsMenu();
 
                 selectedFragment = new CalendarFragment();
@@ -243,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
         MenuItem deleteItem = menu.findItem(R.id.delete_item);
         MenuItem clearSelectionItem = menu.findItem(R.id.clear_selection_item);
         MenuItem settingsItem = menu.findItem(R.id.settings_item);
+        MenuItem filterItem = menu.findItem(R.id.filter_item);
+        MenuItem filterDueDateItem = menu.findItem(R.id.sort_due_date_item);
+        MenuItem switchLayoutItem = menu.findItem(R.id.switch_layout_item);
 
         if (CalendarFragment.isCardSelected) {
             deleteItem.setVisible(true);
@@ -254,7 +285,9 @@ public class MainActivity extends AppCompatActivity {
 
             CalendarFragment.isCardSelected = false;
         } else {
-            searchItem.setVisible(MainActivity.isSearchEnabled);
+            searchItem.setVisible(MainActivity.isInCalendarFragment);
+            filterItem.setVisible(MainActivity.isInCalendarFragment);
+            switchLayoutItem.setVisible(MainActivity.isInCalendarFragment);
 
             calendarSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
@@ -270,6 +303,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     CalendarFragment.cardAdapter.setTaskList(taskList);
+
+                    MainActivity.this.invalidateOptionsMenu();
 
                     return false;
                 }
@@ -321,6 +356,26 @@ public class MainActivity extends AppCompatActivity {
             CalendarFragment.isCardSelected = false;
 
             MainActivity.this.invalidateOptionsMenu();
+        } else if (id == R.id.sort_due_date_item) {
+            CalendarFragment.sortPreference = SortPreference.DUE_DATE;
+            CalendarFragment.saveSortPreference(MainActivity.this);
+
+            CalendarFragment.cardAdapter.sort();
+
+            // notify the recyclerview that the list has changed when the list is sorted
+            CalendarFragment.cardAdapter.notifyItemRangeChanged(0,
+                    CalendarFragment.cardAdapter.getItemCount());
+
+        } else if (id == R.id.sort_priority_item) {
+            CalendarFragment.sortPreference = SortPreference.PRIORITY;
+            CalendarFragment.saveSortPreference(MainActivity.this);
+
+            CalendarFragment.cardAdapter.sort();
+
+            // notify the recyclerview that the list has changed when the list is sorted
+            CalendarFragment.cardAdapter.notifyItemRangeChanged(0,
+                    CalendarFragment.cardAdapter.getItemCount());
+
         }
 
         return super.onOptionsItemSelected(item);

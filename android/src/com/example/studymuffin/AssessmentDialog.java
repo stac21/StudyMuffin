@@ -223,24 +223,28 @@ public class AssessmentDialog {
                         String description = descriptionET.getText().toString();
                         String pointsStr = pointsET.getText().toString();
 
+                        System.out.println("Name: " + name);
+                        System.out.println("Desc: " + description);
+                        System.out.println("points: " + pointsStr);
+
                         Context context = fView.getContext();
 
-                        if (name.length() != 0 && description.length() != 0 && pointsStr != null) {
+                        if (name.length() != 0 && description.length() != 0 &&
+                                pointsStr.length() != 0) {
                             Task task = new Assessment(name, description, selectedDate,
                                     selectedStartHour, selectedStartMinute, notifyCB.isChecked(),
                                     Integer.parseInt(pointsStr), selectedEndHour, selectedEndMinute,
-                                    priority);
+                                    priority, ClassFragment.getCourseAtIndex(context,
+                                    selectedClassIndex).getUniqueId());
 
                             Toast.makeText(context, "Task created", Toast.LENGTH_SHORT).show();
 
                             // TODO: add the task to the selected course
                             CalendarFragment.addTaskToCalendar(task);
 
-                            CalendarFragment.cardAdapter.addCard(task);
+                            CalendarFragment.cardAdapter.addCard(task, selectedClassIndex);
 
-                            ClassFragment.addTaskToClass(context, selectedClassIndex, task);
-
-                            new MyNotification(context, task);
+                            MyNotification.registerAlarm(context, task);
 
                             dialog.dismiss();
                         } else {

@@ -28,7 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -37,16 +42,21 @@ import java.util.Calendar;
 
 public class CalendarFragment extends Fragment {
     private View view;
-    private static final int LECTURE_DAY_COLOR = Color.CYAN;
-    private static final int ASSIGNMENT_DAY_COLOR = Color.RED;
-    private ArrayList<CourseInfo> courseList;
-    private static CompactCalendarView calendarView;
+
+    public static final int ASSESSMENT_COLOR = Color.CYAN;
+    public static final int ASSIGNMENT_COLOR = Color.RED;
+    public static final int PHYSICAL_MEETING_COLOR = Color.GREEN;
+    public static final int VIRTUAL_MEETING_COLOR = Color.YELLOW;
+    public static ArrayList<CourseInfo> courseList;
+    public static CompactCalendarView calendarView;
     public static CalendarCardAdapter cardAdapter;
     public static boolean isCardSelected = false;
-    public static boolean isSearching = false;
     public static int selectedCardPosition;
+    public static SortPreference sortPreference;
 
-    public static final String TASK_FILE = "com.example.studymuffin.task_file";
+    public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
+    public static final String SORT_PREFERENCE_FILE = "com.example.studymuffin.sort_preference";
+    public static final String TASK_ID_COUNTER_FILE = "com.example.studymuffin.task_id_counter_file";
 
     @Nullable
     @Override
@@ -58,12 +68,24 @@ public class CalendarFragment extends Fragment {
 
         final FloatingActionButton fab = view.findViewById(R.id.calendar_fab);
         final TextView monthLabel = view.findViewById(R.id.calendar_month_label);
-        calendarView = view.findViewById(R.id.compact_calendar_view);
+
+        if (calendarView == null) {
+            calendarView = view.findViewById(R.id.compact_calendar_view);
+        }
+        if (sortPreference == null) {
+            System.out.println("sortPreference is null");
+            sortPreference = loadSortPreference(context);
+            System.out.println("Finished loading sort preference");
+        }
 
         // TODO: save the tasks into the course list
-        ArrayList<Task> list = loadTaskList(context);
+        if (cardAdapter == null) {
+            System.out.println("CardAdapter is null");
+            cardAdapter = new CalendarCardAdapter(loadTaskList(context));
+        }
+        Task.idCounter = loadTaskIdCounter(context);
 
-        cardAdapter = new CalendarCardAdapter(list);
+        courseList = ClassFragment.loadCourseList(context);
 
         this.makeRecyclerView();
 
@@ -71,44 +93,38 @@ public class CalendarFragment extends Fragment {
 
         final String[] months = r.getStringArray(R.array.months_array);
 
-        courseList = ClassFragment.loadCourseList(context);
+        final String[] courseNamesArr = new String[courseList.size()];
 
-        if (courseList == null) {
-            courseList = new ArrayList<>();
+        for (int i = 0; i < courseNamesArr.length; i++) {
+            courseNamesArr[i] = courseList.get(i).getTitle();
         }
-
-        ArrayList<String> courseTitles = new ArrayList<>();
-
-        for (int i = 0; i < courseList.size(); i++) {
-            courseTitles.add(courseList.get(i).getTitle());
-        }
-
-        final String[] courseNamesArr = new String[courseTitles.size()];
-        courseTitles.toArray(courseNamesArr);
 
         // set the month label to the current month
         Calendar calendar = Calendar.getInstance();
         int currentMonth = calendar.get(Calendar.MONTH);
 
         monthLabel.setText(months[currentMonth]);
-        populateCalendar(courseList);
+        populateCalendar(cardAdapter.getTaskList());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View fabView) {
                 Context context = fabView.getContext();
+
+                if (courseList.size() == 0) {
+                    Toast.makeText(context, r.getString(R.string.create_course),
+                            Toast.LENGTH_LONG).show();
+
+                    return;
+                }
+
                 TaskSelectionDialog selectionDialog = new TaskSelectionDialog(context);
                 AlertDialog alertDialog = selectionDialog.getAlertDialog();
 
                 alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
-                        if (courseList.size() == 0) {
-                            Toast.makeText(context, r.getString(R.string.create_course),
-                                    Toast.LENGTH_LONG).show();
 
-                            return;
-                        }
                         Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
                         positiveButton.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -157,20 +173,11 @@ public class CalendarFragment extends Fragment {
     /**
      * populates the calendar with all of the month's tasks
      * TODO make this efficient so that it only checks the current month's tasks
-     * @param courseList the list of courses
+     * @param taskList the list of tasks
      */
-    public void populateCalendar(ArrayList<CourseInfo> courseList) {
-        ArrayList<Task> taskList;
-
-        for (int i = 0; i < courseList.size(); i++) {
-            taskList = courseList.get(i).getTaskList();
-
-            for (int j = 0; j < taskList.size(); j++) {
-                System.out.println("Date: " + taskList.get(j).getDate());
-                System.out.println("Date in epoch: " + taskList.get(j).getDate().getTime());
-
-                addTaskToCalendar(taskList.get(j));
-            }
+    public void populateCalendar(ArrayList<Task> taskList) {
+        for (int j = 0; j < taskList.size(); j++) {
+            addTaskToCalendar(taskList.get(j));
         }
     }
 
@@ -179,7 +186,19 @@ public class CalendarFragment extends Fragment {
      * @param task the task to add to the calendar view
      */
     public static void addTaskToCalendar(Task task) {
-        calendarView.addEvent(new Event(ASSIGNMENT_DAY_COLOR,
+        int color;
+
+        if (task instanceof Assignment) {
+            color = ASSIGNMENT_COLOR;
+        } else if (task instanceof Assessment) {
+            color = ASSESSMENT_COLOR;
+        } else if (task instanceof PhysicalMeeting) {
+            color = PHYSICAL_MEETING_COLOR;
+        } else {
+            color = VIRTUAL_MEETING_COLOR;
+        }
+
+        calendarView.addEvent(new Event(color,
                 task.getDate().getTime(), task.getName()));
     }
 
@@ -195,11 +214,6 @@ public class CalendarFragment extends Fragment {
         return total;
     }
 
-    /**
-     * returns the number of days in the month
-     * @param month the current month represented as an int
-     * @return the number of days in the given month
-     */
     private byte getDaysInMonth(int month) {
         switch (month) {
             case Calendar.JANUARY:
@@ -279,7 +293,8 @@ public class CalendarFragment extends Fragment {
                         task.setCompleted(true);
 
                         System.out.println("Card at " + selectedCardPosition + " clicked");
-                        CalendarFragment.cardAdapter.removeCard();
+
+                        //CalendarFragment.cardAdapter.removeCard();
                     }
                 }
             });
@@ -356,21 +371,26 @@ public class CalendarFragment extends Fragment {
             return new CardViewHolder(itemView);
         }
 
-        public void addCard(Task task) {
+        public void addCard(Task task, int courseIndex) {
             this.taskList.add(task);
 
             this.notifyItemInserted(this.getItemCount() + 1);
+            this.sort();
+            // notify the recyclerview that the list has changed when the list is sorted
+            this.notifyItemRangeChanged(0, this.getItemCount());
 
             saveTaskList(view.getContext(), this.taskList);
         }
 
         public void removeCard() {
+            Task task = this.taskList.get(selectedCardPosition);
             this.taskList.remove(selectedCardPosition);
 
             this.notifyItemRemoved(selectedCardPosition);
             this.notifyItemChanged(selectedCardPosition, this.getItemCount());
 
             saveTaskList(view.getContext(), this.taskList);
+            // ClassFragment.setClassTaskList(getContext(), task);
         }
 
         /**
@@ -390,26 +410,198 @@ public class CalendarFragment extends Fragment {
 
             this.setTaskList(filteredTasks);
         }
+
+        /**
+         * sorts the tasklist based on the user's preferred attribute using merge sort
+         */
+        public void sort() {
+            this.mergeSort(0, this.getItemCount() - 1);
+        }
+
+        /**
+         * sorts the task list by the attribute that the user has chosen in their sort preference.
+         * @param p the starting index of the list
+         * @param r the ending index of the list
+         */
+        public void mergeSort(int p, int r) {
+            // if list's size > 1
+            if (p < r) {
+                int q = (p + r) / 2;
+
+                mergeSort(p, q);
+                mergeSort(q + 1, r);
+                merge(p, q, r);
+            }
+        }
+
+        /**
+         * merge the two subarrays [p..q] and [q + 1..r]
+         * @param p the start index of the merged subarray
+         * @param q the middle index of the merged subarray
+         * @param r the end index of the merged subarray
+         */
+        public void merge(int p, int q, int r) {
+            int lowSize = q - p + 1;
+            int highSize = r - q;
+            Task[] lowHalf = new Task[lowSize];
+            Task[] highHalf = new Task[highSize];
+            int i = 0, j = 0, k = p;
+
+            for (int n = 0; k <= q; n++, k++) {
+                lowHalf[n] = this.taskList.get(k);
+            }
+            for (int n = 0; k <= r; n++, k++) {
+                highHalf[n] = this.taskList.get(k);
+            }
+
+            k = p;
+
+            while (i < lowSize && j < highSize) {
+                Task lowVal = lowHalf[i];
+                Task highVal = highHalf[j];
+
+                if (lowVal.compareToByPreference(highVal) < 0) {
+                    this.taskList.set(k++, lowVal);
+                    i++;
+                } else {
+                    this.taskList.set(k++, highVal);
+                    j++;
+                }
+            }
+
+            while (i < lowSize) {
+                this.taskList.set(k++, lowHalf[i++]);
+            }
+            while (j < highSize) {
+                this.taskList.set(k++, highHalf[j++]);
+            }
+        }
+    }
+
+    public static SortPreference loadSortPreference(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String json = sp.getString(SORT_PREFERENCE_FILE, null);
+
+        Type collectionType = new TypeToken<SortPreference>(){}.getType();
+        SortPreference sortPreference = new Gson().fromJson(json, collectionType);
+
+        if (sortPreference != null) {
+            return sortPreference;
+        } else {
+            return SortPreference.DUE_DATE;
+        }
+    }
+
+    public static void saveSortPreference(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String json = new Gson().toJson(sortPreference);
+
+        editor.putString(SORT_PREFERENCE_FILE, json);
+
+        editor.apply();
     }
 
     public static ArrayList<Task> loadTaskList(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(TASK_FILE, null);
 
+        /*
         Type collectionType = new TypeToken<ArrayList<Task>>(){}.getType();
         ArrayList<Task> taskList = new Gson().fromJson(json, collectionType);
+         */
+
+        if (MainActivity.userAccount != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+        }
+
+        ArrayList<Task> taskList = new ArrayList<>();
+
+        // if the save file exists, load the data
+        if (json != null) {
+            Gson gson = new Gson();
+            JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
+            String currentElementJson;
+
+            System.out.println("JSONArray size = " + jsonArray.size());
+            for (int i = 0; i < jsonArray.size(); i++) {
+                currentElementJson = jsonArray.get(i).toString();
+
+                System.out.println(currentElementJson);
+
+                if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSIGNMENT.toString()
+                        + "\"")) {
+                    Assignment a = gson.fromJson(currentElementJson, Assignment.class);
+                    taskList.add(a);
+                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSESSMENT
+                        .toString() + "\"")) {
+                    Assessment a = gson.fromJson(currentElementJson, Assessment.class);
+                    taskList.add(a);
+                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.VIRTUAL_MEETING
+                        .toString() + "\"")) {
+                    VirtualMeeting vm = gson.fromJson(currentElementJson, VirtualMeeting.class);
+                    taskList.add(vm);
+                } else {
+                    PhysicalMeeting pm = gson.fromJson(currentElementJson, PhysicalMeeting.class);
+                    taskList.add(pm);
+                }
+            }
+        }
 
         return taskList;
     }
 
+    /**
+     * saves the task list to firebase if the user has an account, and locally no matter what
+     * @param context the application's context
+     * @param taskList an ArrayList of the user's tasks
+     */
     public static void saveTaskList(Context context, ArrayList<Task> taskList) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        // save the data locally
         String json = new Gson().toJson(taskList);
 
         editor.putString(TASK_FILE, json);
+        editor.putInt(TASK_ID_COUNTER_FILE, Task.idCounter);
+
+        // save the data to firebase
+        if (MainActivity.userAccount != null) {
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.userAccount.getEmail());
+            ref.document(TASK_FILE).set(json);
+            ref.document(TASK_ID_COUNTER_FILE).set(Task.idCounter);
+        }
+
 
         editor.apply();
+    }
+
+    /**
+     * load the idCounter for tasks
+     * @param context the application's context
+     * @return the idCounter for task's
+     */
+    public static int loadTaskIdCounter(Context context) {
+        int counter = 0;
+
+        if (MainActivity.userAccount != null) {
+            System.out.println("The user account is not null");
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.userAccount.getEmail());
+            // ref.document(TASK_FILE).get();
+        } else {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+            counter = sp.getInt(TASK_ID_COUNTER_FILE, 0);
+        }
+
+        return counter;
     }
 }

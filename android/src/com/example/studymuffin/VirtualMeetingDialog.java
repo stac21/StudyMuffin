@@ -205,18 +205,17 @@ public class VirtualMeetingDialog {
                             Task task = new PhysicalMeeting(name, description, selectedDate,
                                     selectedStartHour, selectedStartMinute, notifyCB.isChecked(),
                                     recurringCB.isSelected(), selectedEndHour, selectedEndMinute,
-                                    locationStr, priority);
+                                    locationStr, priority, ClassFragment.getCourseAtIndex(context,
+                                    selectedClassIndex).getUniqueId());
 
                             Toast.makeText(context, "Task created", Toast.LENGTH_SHORT).show();
 
                             // TODO: add the task to the selected course
                             CalendarFragment.addTaskToCalendar(task);
 
-                            CalendarFragment.cardAdapter.addCard(task);
+                            CalendarFragment.cardAdapter.addCard(task, selectedClassIndex);
 
-                            ClassFragment.addTaskToClass(context, selectedClassIndex, task);
-
-                            new MyNotification(context, task);
+                            MyNotification.registerAlarm(context, task);
 
                             dialog.dismiss();
                         } else {

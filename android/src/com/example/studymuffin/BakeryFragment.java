@@ -1,5 +1,7 @@
 package com.example.studymuffin;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,16 +21,16 @@ public class BakeryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_bakery, container, false);
 
+        Context context = this.view.getContext();
+
         final Button shopButton = this.view.findViewById(R.id.bakery_shop_button);
-        final ImageView bakery = this.view.findViewById(R.id.bakery);
-        final ImageView bakeryEmpty = this.view.findViewById(R.id.bakery_empty);
 
         shopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bakery.setVisibility(View.VISIBLE);
-                bakeryEmpty.setVisibility(View.INVISIBLE);
-                shopButton.setText("Exit shop");
+                Intent i = new Intent(context, AndroidLauncher.class);
+
+                startActivity(i);
             }
         });
 
