@@ -38,7 +38,9 @@ public class TaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SettingsActivity.setThemeOfApp(this);
         setContentView(R.layout.activity_task);
+
         Resources r = this.getResources();
 
         final Context context = TaskActivity.this;
