@@ -1,25 +1,36 @@
 package com.example.studymuffin;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class TaskActivity extends AppCompatActivity {
@@ -31,6 +42,17 @@ public class TaskActivity extends AppCompatActivity {
     private TextView priorityTv;
     private Spinner prioritySpinner;
     private CheckBox completedCb;
+
+    private View view;
+    public static TaskActivity.TaskCardAdapter cardAdapter;
+    public static boolean isCardSelected = false;
+    public static boolean isSearching = false;
+    public static int selectedCardPosition;
+
+    public static final String GOAL_FILE = "com.example.studymuffin.goal_file";
+
+    public FloatingActionButton addGoal;
+    private String m_Text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,5 +172,116 @@ public class TaskActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void makeRecyclerView() {
+        RecyclerView recyclerView = TaskActivity.this.findViewById(R.id.recyclerViewGoals);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager llm = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(cardAdapter);
+    }
+
+    public class CardViewHolder extends RecyclerView.ViewHolder{
+        protected CheckBox checkBox;
+
+        public CardViewHolder(View v) {
+            super(v);
+
+            this.checkBox = (CheckBox) v.findViewById(R.id.todoCheckBox);
+            this.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        selectedCardPosition = getAdapterPosition();
+
+                        Goal goal = TaskActivity.cardAdapter.getTask(selectedCardPosition);
+                        goal.setCompleted(true);
+
+                        System.out.println("Card at " + selectedCardPosition + " clicked");
+                        TaskActivity.cardAdapter.removeCard();
+                    }
+                }
+            });
+        }
+
+    }
+
+
+    public class TaskCardAdapter extends RecyclerView.Adapter<TaskActivity.CardViewHolder> {
+        private ArrayList<Goal> goalList;
+
+        public TaskCardAdapter(ArrayList<Goal> goalList) {
+            if (goalList != null) {
+                this.goalList = goalList;
+            } else {
+                this.goalList = new ArrayList<>();
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return this.goalList.size();
+        }
+
+        public Goal getTask(int position) {
+            return this.goalList.get(position);
+        }
+
+        public ArrayList<Goal> getGoalList() {
+            return this.goalList;
+        }
+
+        public void setGoalList(ArrayList<Goal> goalList) {
+            int prevSize = this.goalList.size();
+
+            this.goalList = goalList;
+
+            this.notifyItemRangeRemoved(0, prevSize);
+            this.notifyItemRangeInserted(0, goalList.size());
+        }
+
+        public void onBindViewHolder(TaskActivity.CardViewHolder v, int i) {
+            Goal goal = this.goalList.get(i);
+
+            v.checkBox.setText(goal.getName());
+        }
+
+        public TaskActivity.CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            final View itemView = LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.task_layout, parent, false);
+
+            return new TaskActivity.CardViewHolder(itemView);
+        }
+
+        public void addCard(Goal goal) {
+            this.goalList.add(goal);
+
+            this.notifyItemInserted(this.getItemCount() + 1);
+
+            //saveTask(context, task)
+            saveGoalList(TaskActivity.this, this.goalList);
+        }
+
+        public void removeCard() {
+            this.goalList.remove(selectedCardPosition);
+
+            this.notifyItemRemoved(selectedCardPosition);
+            this.notifyItemChanged(selectedCardPosition, this.getItemCount());
+
+            //saveTask(context, task)
+            saveGoalList(TaskActivity.this, this.goalList);
+        }
+    }
+    public static void saveGoalList(Context context, ArrayList<Goal> goalList) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String json = new Gson().toJson(goalList);
+
+        editor.putString(GOAL_FILE, json);
+
+        editor.apply();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.studymuffin;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 // needed to make this not abstract so that the saving/loading to/from json would work
@@ -16,6 +17,7 @@ public class Task {
     private int uniqueId;
     public static int idCounter;
     private TaskType taskType;
+    private ArrayList<Goal> goals;
 
     public Task(String name, String description, Date date, int startTimeHour, int startTimeMinute,
                 boolean notify, Priority priority, int courseId, TaskType taskType) {
@@ -31,6 +33,7 @@ public class Task {
         // need to change this uniqueId to actually be unique
         this.uniqueId = idCounter++;
         this.taskType = taskType;
+        goals = new ArrayList<>();
     }
 
     public String getName() {
@@ -112,6 +115,10 @@ public class Task {
     public void setIdCounter(int mIdCounter) {
         idCounter = mIdCounter;
     }
+
+    public ArrayList<Goal> getGoals() { return goals; }
+
+    public void setGoals(ArrayList<Goal> goals) { this.goals = goals; }
 
     /**
      * compares two tasks by the attribute the user selected in their sort preference, found in
