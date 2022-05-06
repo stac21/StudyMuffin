@@ -199,8 +199,6 @@ public class TaskActivity extends AppCompatActivity {
         MenuItem saveItem = menu.findItem(R.id.save_item);
         MenuItem cancelItem = menu.findItem(R.id.cancel_item);
 
-
-
         return super.onPrepareOptionsMenu(menu);
     }
 
