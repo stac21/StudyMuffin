@@ -120,6 +120,17 @@ public class Task {
 
     public void setGoals(ArrayList<Goal> goals) { this.goals = goals; }
 
+    public void addToGoals(Goal goal){ goals.add(goal); }
+
+    public void removeFromGoals(Goal goal){
+        for(int i = 0; i < goals.size(); i++){
+            if(goals.get(i).getName().equals(goal.getName())){
+                goals.remove(i);
+                break;
+            }
+        }
+    }
+
     /**
      * compares two tasks by the attribute the user selected in their sort preference, found in
      * CalendarFragment

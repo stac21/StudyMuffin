@@ -1,10 +1,12 @@
 package com.example.studymuffin;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -110,6 +113,38 @@ public class TaskActivity extends AppCompatActivity {
 
             }
         });
+        addGoal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View fabView) {
+                Context context = fabView.getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(addGoal.getContext());
+                View viewInflated = LayoutInflater.from(addGoal.getContext()).inflate(R.layout.dialog, (ViewGroup) addGoal.getRootView(), false);
+
+                final EditText input = (EditText) viewInflated.findViewById(R.id.name_et);
+                viewInflated.findViewById(R.id.classSpinnerTextView).setVisibility(View.INVISIBLE);
+                viewInflated.findViewById(R.id.classSpinner).setVisibility(View.INVISIBLE);
+
+                builder.setView(viewInflated);
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        m_Text = input.getText().toString();
+                        Goal g = new Goal(m_Text);
+                        cardAdapter.addCard(g);
+                        Log.i("add goal", m_Text);
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
     }
 
     /**
@@ -174,6 +209,8 @@ public class TaskActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Start of Goal/Subtasks code
+
     public void makeRecyclerView() {
         RecyclerView recyclerView = TaskActivity.this.findViewById(R.id.recyclerViewGoals);
         recyclerView.setHasFixedSize(true);
@@ -196,7 +233,7 @@ public class TaskActivity extends AppCompatActivity {
                     if (isChecked) {
                         selectedCardPosition = getAdapterPosition();
 
-                        Goal goal = TaskActivity.cardAdapter.getTask(selectedCardPosition);
+                        Goal goal = TaskActivity.cardAdapter.getGoal(selectedCardPosition);
                         goal.setCompleted(true);
 
                         System.out.println("Card at " + selectedCardPosition + " clicked");
@@ -225,7 +262,7 @@ public class TaskActivity extends AppCompatActivity {
             return this.goalList.size();
         }
 
-        public Goal getTask(int position) {
+        public Goal getGoal(int position) {
             return this.goalList.get(position);
         }
 
@@ -259,6 +296,7 @@ public class TaskActivity extends AppCompatActivity {
             this.goalList.add(goal);
 
             this.notifyItemInserted(this.getItemCount() + 1);
+
 
             //saveTask(context, task)
             saveGoalList(TaskActivity.this, this.goalList);
