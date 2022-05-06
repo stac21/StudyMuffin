@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,10 @@ public class BakeryFragment extends Fragment {
 
         Context context = this.view.getContext();
 
+        final TextView studyPointsEarnedTv = this.view.findViewById(R.id.study_points_earned_tv);
         final Button shopButton = this.view.findViewById(R.id.bakery_shop_button);
+
+        studyPointsEarnedTv.append(" " + MainActivity.profile.getNumPoints());
 
         shopButton.setOnClickListener(new View.OnClickListener() {
             @Override

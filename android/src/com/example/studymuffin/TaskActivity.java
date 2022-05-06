@@ -98,11 +98,10 @@ public class TaskActivity extends AppCompatActivity {
 
         this.nameEt.setText(task.getName());
         this.descriptionEt.setText(task.getDescription());
-        this.taskTypeTv.setText(this.taskTypeTv.getText().toString() + ": " +
-                task.getTaskType().toString());
+        this.taskTypeTv.append(": " + task.getTaskType().toString());
         // sets the date and trims it to only contain the day of week and date
         this.dateTv.setText(this.trimDateStr(task.getDate()));
-        this.startTimeTv.setText(this.getAmPmFormat(task.getStartTimeHour(), task.getStartTimeMinute()));
+        this.startTimeTv.setText(getAmPmFormat(task.getStartTimeHour(), task.getStartTimeMinute()));
         this.notifyCb.setChecked(task.shouldNotify());
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
@@ -140,7 +139,6 @@ public class TaskActivity extends AppCompatActivity {
                         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
                             }
                         });
 
@@ -271,7 +269,7 @@ public class TaskActivity extends AppCompatActivity {
      * @param date the task's date
      * @return a formatted string representation of the date
      */
-    private String trimDateStr(Date date) {
+    private static String trimDateStr(Date date) {
         DateFormat df = new SimpleDateFormat("E, MMM dd, yyyy");
 
         return df.format(date);
@@ -333,7 +331,6 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     //Start of Goal/Subtasks code
-
     public void makeRecyclerView() {
         RecyclerView recyclerView = TaskActivity.this.findViewById(R.id.recyclerViewGoals);
         recyclerView.setHasFixedSize(true);
