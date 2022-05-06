@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
     public static SearchView calendarSearchView;
     public static Account userAccount;
     private FirebaseAuth mAuth;
-    public static Profile profile = new Profile("Profile", "One", 0, 0);
+    // public static Profile profile = new Profile("Profile", "One", 0, 0);
+    public static Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         userAccount = Account.loadAccount(MainActivity.this);
+        profile = Profile.loadProfile(MainActivity.this);
 
         if (currentFragment != SIGN_IN_PAGE) {
             bottomNav.setVisibility(View.VISIBLE);

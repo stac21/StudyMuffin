@@ -69,13 +69,18 @@ public class Profile {
      * @param context the application's context
      * @return the user's profile
      */
-    public Profile loadProfile(Context context) {
+    public static Profile loadProfile(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(PROFILE_FILE, null);
 
         Type collectionType = new TypeToken<Profile>(){}.getType();
+        Profile profile = new Gson().fromJson(json, collectionType);
 
-        return new Gson().fromJson(json, collectionType);
+        if (profile != null) {
+            return profile;
+        } else {
+            return new Profile("Profile", "One", 0, 0);
+        }
     }
 
     /**
@@ -96,5 +101,22 @@ public class Profile {
         editor.apply();
 
         // TODO upload the updated profile to the user's account in Firebase
+    }
+
+    /**
+     * save the profile's information both locally to a JSON file
+     * as well as to the Firebase instance associated with their account,
+     * if it exists
+     * @param context the application's context
+     */
+    public void save(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String json = new Gson().toJson(this);
+
+        editor.putString(PROFILE_FILE, json);
+
+        editor.apply();
     }
 }

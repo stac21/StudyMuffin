@@ -20,7 +20,8 @@ public class MyTimer {
     private View view;
     private boolean isFinished;
     private boolean isExited;
-    private Profile profile;
+    // the amount of points to reward the user when they finish a timer
+    public static final int POINTS = 1000;
 
     public MyTimer(View view) {
         this.view = view;
@@ -31,7 +32,6 @@ public class MyTimer {
         this.isPaused = false;
         this.isFinished = true;
         this.isExited = false;
-        this.profile = new Profile("Dave", "Smith", 0, 0);
     }
 
     public void start() {
@@ -71,7 +71,8 @@ public class MyTimer {
 
                 isFinished = true;
 
-                profile.addPoints(10);
+                MainActivity.profile.addPoints(POINTS);
+                MainActivity.profile.save(context);
             }
         }.start();
     }
