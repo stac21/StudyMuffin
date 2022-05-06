@@ -81,6 +81,7 @@ public class TaskActivity extends AppCompatActivity {
 
         this.nameEt = this.findViewById(R.id.name_et);
         this.descriptionEt = this.findViewById(R.id.description_et);
+        this.taskTypeTv = this.findViewById(R.id.task_type_tv);
         this.dateTv = this.findViewById(R.id.date_tv);
         this.startTimeTv = this.findViewById(R.id.start_time_tv);
         this.notifyCb = this.findViewById(R.id.notify_cb);
