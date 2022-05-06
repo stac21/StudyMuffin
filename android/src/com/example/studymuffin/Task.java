@@ -126,9 +126,9 @@ public class Task {
 
     public void addToGoals(Goal goal){ goals.add(goal); }
 
-    public void removeFromGoals(Goal goal){
-        for(int i = 0; i < goals.size(); i++){
-            if(goals.get(i).getName().equals(goal.getName())){
+    public void removeFromGoals(Goal goal) {
+        for (int i = 0; i < goals.size(); i++) {
+            if (goals.get(i).getName().equals(goal.getName())) {
                 goals.remove(i);
                 break;
             }

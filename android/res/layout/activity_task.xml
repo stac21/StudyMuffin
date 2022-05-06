@@ -45,12 +45,11 @@
         android:text="@string/due_date"
         android:textSize="30sp"
         android:padding="10dp"/>
-
     <TextView
         android:id="@+id/date_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/description_et"
+        android:layout_below="@id/task_type_tv"
         android:layout_toEndOf="@id/date_label_tv"
         android:textSize="30sp"
         android:padding="10dp"/>
@@ -135,8 +134,7 @@
         android:id="@+id/recyclerViewGoals"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/priority_tv"
-        android:layout_above="@id/add_goal"
+        android:layout_below="@id/completed_tv"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </RelativeLayout>

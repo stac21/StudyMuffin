@@ -38,6 +38,7 @@ import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TaskActivity extends AppCompatActivity {
@@ -50,6 +51,8 @@ public class TaskActivity extends AppCompatActivity {
     private Spinner prioritySpinner;
     private CheckBox completedCb;
     private TextView taskTypeTv;
+    // the task that is currently being viewed by the user
+    private Task task;
 
     private View view;
     public static TaskActivity.TaskCardAdapter cardAdapter;
@@ -73,9 +76,13 @@ public class TaskActivity extends AppCompatActivity {
         // get the task information from the CalendarFragment's intent
         Intent i = this.getIntent();
         String json = i.getStringExtra("com.example.studymuffin.task");
-        final Task task = CalendarFragment.convertJsonToTask(json);
+        this.task = CalendarFragment.convertJsonToTask(json);
 
-        ArrayList<Goal> goalList = new ArrayList<>();
+        ArrayList<Goal> goalList = task.getGoals();
+
+        for (Goal g : goalList) {
+            System.out.println(g.getName());
+        }
         cardAdapter = new TaskCardAdapter(goalList);
         makeRecyclerView();
 
@@ -241,6 +248,10 @@ public class TaskActivity extends AppCompatActivity {
                         Goal g = new Goal(m_Text);
                         cardAdapter.addCard(g);
                         Log.i("add goal", m_Text);
+
+                        for (Goal goal : task.getGoals()) {
+                            System.out.println(goal.getName());
+                        }
                     }
                 });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -405,23 +416,24 @@ public class TaskActivity extends AppCompatActivity {
         }
 
         public void addCard(Goal goal) {
-            this.goalList.add(goal);
+            //this.goalList.add(goal);
 
             this.notifyItemInserted(this.getItemCount() + 1);
 
-
-            //saveTask(context, task)
-            saveGoalList(TaskActivity.this, this.goalList);
+            task.addToGoals(goal);
+            CalendarFragment.saveTask(TaskActivity.this, task);
         }
 
         public void removeCard() {
+            Goal goal = this.goalList.get(selectedCardPosition);
+
             this.goalList.remove(selectedCardPosition);
 
             this.notifyItemRemoved(selectedCardPosition);
             this.notifyItemChanged(selectedCardPosition, this.getItemCount());
 
-            //saveTask(context, task)
-            saveGoalList(TaskActivity.this, this.goalList);
+            task.removeFromGoals(goal);
+            CalendarFragment.saveTask(TaskActivity.this, task);
         }
     }
     public static void saveGoalList(Context context, ArrayList<Goal> goalList) {

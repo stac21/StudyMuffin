@@ -78,11 +78,14 @@ public class CalendarFragment extends Fragment {
             System.out.println("Finished loading sort preference");
         }
 
-        // TODO: save the tasks into the course list
+        cardAdapter = new CalendarCardAdapter(loadTaskList(context));
+/*
         if (cardAdapter == null) {
             System.out.println("CardAdapter is null");
             cardAdapter = new CalendarCardAdapter(loadTaskList(context));
         }
+        */
+
         Task.idCounter = loadTaskIdCounter(context);
 
         courseList = ClassFragment.loadCourseList(context);
@@ -168,6 +171,13 @@ public class CalendarFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        cardAdapter.setTaskList(loadTaskList(view.getContext()));
     }
 
     /**
