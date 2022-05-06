@@ -69,6 +69,10 @@ public class TaskActivity extends AppCompatActivity {
         Type collectionType = new TypeToken<Task>(){}.getType();
         Task task = new Gson().fromJson(json, collectionType);
 
+        ArrayList<Goal> goalList = new ArrayList<>();
+        cardAdapter = new TaskCardAdapter(goalList);
+        makeRecyclerView();
+
         this.nameEt = this.findViewById(R.id.name_et);
         this.descriptionEt = this.findViewById(R.id.description_et);
         this.dateTv = this.findViewById(R.id.date_tv);
@@ -87,6 +91,8 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
         this.completedCb.setChecked(task.isCompleted());
+
+        addGoal = this.findViewById(R.id.add_goal);
 
         // set up the priority spinner
         final String[] priorities = r.getStringArray(R.array.priority_array);
