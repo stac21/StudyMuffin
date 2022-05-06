@@ -27,8 +27,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +53,8 @@ public class NotesFragment extends Fragment {
     private CardAdapter cardAdapter;
     private ArrayList<NoteInfo> list;
     private Set<String> titleList;
-    private String userName;
+    private String currentUserName;
+    private FirebaseAuth mAuth;
     SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
     public static final String NOTES_FILE = "com.example.studymuffin.notes_file";
@@ -60,36 +68,49 @@ public class NotesFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         list = new ArrayList<>();
         titleList = new HashSet<>();
-        //mAuth = FirebaseAuth.getInstance();
-        //userName = mAuth.getCurrentUser().toString();
-        userName = "sarita.chap@gmail.com";
+        mAuth = FirebaseAuth.getInstance();
+            currentUserName = "sarita.chap@gmail.com";
+            sharedpreferences = this.getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
-        sharedpreferences = this.getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+            //Get stored list of titles
+            titleList.addAll(sharedpreferences.getStringSet("key", titleList));
+            //titleList = sharedpreferences.getStringSet("key", titleList);
 
 
-        //Get stored list of titles
-        titleList.addAll(sharedpreferences.getStringSet("key", titleList));
-        //titleList = sharedpreferences.getStringSet("key", titleList);
+            if (MainActivity.userAccount != null) {
+                ArrayList<String> titleArray
+                        = new ArrayList<>();
+                titleArray.addAll(titleList);
 
-        //list.add(new NoteInfo("Hello", 4, 1));
-        //titleList.add("Hello");
-        SharedPreferences.Editor editor = sharedpreferences.edit();
-
-        if (MainActivity.userAccount != null) {
-            ArrayList<String> titleArray
-                    = new ArrayList<>();
-            titleArray.addAll(titleList);
-
-            //go through stored string set and add notes to list
-            for (int j = 0; j < titleArray.size(); j++) {
-                list.add(new NoteInfo(titleArray.get(j), sharedpreferences.getInt(titleArray.get(j) + "month", 1),
-                        sharedpreferences.getInt(titleArray.get(j) + "day", 1)));
+                //go through stored string set and add notes to list
+                for (int j = 0; j < titleArray.size(); j++) {
+                    list.add(new NoteInfo(titleArray.get(j), sharedpreferences.getInt(titleArray.get(j) + "month", 1),
+                            sharedpreferences.getInt(titleArray.get(j) + "day", 1)));
+                }
+            } else {
+                list = loadLocalNoteList(getContext());
             }
-        } else {
-            list = loadLocalNoteList(getContext());
-        }
 
-        //list.add(new NoteInfo("Binary Search", 9, 12));
+        //else:
+//            FirebaseFirestore db = FirebaseFirestore.getInstance();
+//            db.collection("Data").document("NoteData").collection(currentUserName)
+//                    .get()
+//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                            if (task.isSuccessful()) {
+//                                for (QueryDocumentSnapshot document : task.getResult()) {
+//                                    Toast.makeText(NotesFragment.this.getContext(), document.getId(), Toast.LENGTH_LONG).show();
+//                                }
+//                            } else {
+//                                //Log.d(TAG, "Error getting documents: ", task.getException());
+//                            }
+//                        }
+//                    });
+
+
+
+        SharedPreferences.Editor editor = sharedpreferences.edit();
 
         this.cardAdapter = new CardAdapter(list);
         this.view = inflater.inflate(R.layout.fragment_notes, container, false);
@@ -197,7 +218,7 @@ public class NotesFragment extends Fragment {
                                 //replace account name in collection path
                                 //document path is titleKey
                                 db.collection("Data").document("NoteData")
-                                        .collection(userName).document(nameET.getText().toString()).set(docData);
+                                        .collection(currentUserName).document(nameET.getText().toString()).set(docData);
 
                                 makeRecyclerView();
                             }

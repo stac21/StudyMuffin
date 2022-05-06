@@ -1,6 +1,7 @@
 package com.example.studymuffin;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static int currentFragment = SIGN_IN_PAGE;
     public static boolean isInCalendarFragment = false;
     public static SearchView calendarSearchView;
+    SharedPreferences sharedpreferences;
     public static Account userAccount;
     private FirebaseAuth mAuth;
 
@@ -100,21 +103,41 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     bottomNav.setVisibility(View.INVISIBLE);
                 }
+                String email = emailET.getText().toString();
+                String password = passwordET.getText().toString();
 
-                signInButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                emailET.setVisibility(View.INVISIBLE);
-                passwordET.setVisibility(View.INVISIBLE);
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
-                studMuffin.setVisibility(View.INVISIBLE);
+                mAuth = FirebaseAuth.getInstance();
+
+                mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            signInButton.setVisibility(View.INVISIBLE);
+                            guestButton.setVisibility(View.INVISIBLE);
+                            emailET.setVisibility(View.INVISIBLE);
+                            passwordET.setVisibility(View.INVISIBLE);
+                            confirmPasswordET.setVisibility(View.INVISIBLE);
+                            registerButton.setVisibility(View.INVISIBLE);
+                            studMuffin.setVisibility(View.INVISIBLE);
+
+                            SharedPreferences.Editor editor = sharedpreferences.edit();
+
+                        }else{
+                            Toast.makeText(MainActivity.this, "Incorrect Username or Password. Try again.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                });
+
             }
         });
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmPasswordET.setVisibility(View.VISIBLE);
+                //confirmPasswordET.setVisibility(View.VISIBLE);
+                passwordET.setVisibility(View.INVISIBLE);
                 createAccountButton.setVisibility(View.VISIBLE);
                 signInButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
@@ -122,33 +145,66 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Not the right file
         //Create a new account with valid email and matching passwords
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                confirmPasswordET.setVisibility(View.INVISIBLE);
+                createAccountButton.setVisibility(View.INVISIBLE);
+                guestButton.setVisibility(View.INVISIBLE);
+                registerButton.setVisibility(View.INVISIBLE);
                 String email = emailET.getText().toString();
                 String password = passwordET.getText().toString();
 
-                mAuth.createUserWithEmailAndPassword(email, password)
+                ActionCodeSettings actionCodeSettings =
+                        ActionCodeSettings.newBuilder()
+                                // URL you want to redirect back to. The domain (www.example.com) for this
+                                // URL must be whitelisted in the Firebase Console.
+                                .setUrl("https://firebase.google.com/docs/auth/android/email-link-auth")
+                                // This must be true
+                                .setHandleCodeInApp(true)
+                                .setAndroidPackageName(
+                                        "com.example.studymuffin",
+                                        true, /* installIfNotAvailable */
+                                        "12"    /* minimumVersion */)
+                                .build();
+
+                mAuth = FirebaseAuth.getInstance();
+
+//                mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if(task.isSuccessful()){
+//                            mAuth
+//                        }
+//                    }
+//                })
+                String tempPassword = "StudyMuffinPassword491B04";
+                mAuth.createUserWithEmailAndPassword(email, tempPassword)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
-                                    // save the account information locally
-                                    userAccount = new Account(email, password);
-                                    userAccount.save(MainActivity.this);
-                                } else {
+                                    mAuth.sendPasswordResetEmail(email)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        //mAuth.signInWithEmailAndPassword(email, tempPassword);
+                                                        //mAuth.getCurrentUser().updatePassword(password);
+                                                        Toast.makeText(MainActivity.this, "Email Sent", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
+                                    Toast.makeText(MainActivity.this, "Registered Successfully. Check your email to set your password and create your account", Toast.LENGTH_LONG).show();
+
+                                }else{
                                     Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
 
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                createAccountButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
+
 
 
                 //Email and Password Verification
