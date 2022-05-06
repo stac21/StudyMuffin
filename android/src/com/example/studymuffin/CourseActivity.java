@@ -26,6 +26,7 @@ public class CourseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SettingsActivity.setThemeOfApp(this);
         setContentView(R.layout.activity_course);
 
         Context context = CourseActivity.this;
@@ -48,9 +49,5 @@ public class CourseActivity extends AppCompatActivity {
         this.classRoom.setText(course.getClassroom());
         this.classLink.setText(course.getZoomLink());
         this.classColor.setText(course.getColor() + "");
-
     }
-
-
-
 }
