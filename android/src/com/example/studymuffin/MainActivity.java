@@ -375,7 +375,12 @@ public class MainActivity extends AppCompatActivity {
             // notify the recyclerview that the list has changed when the list is sorted
             CalendarFragment.cardAdapter.notifyItemRangeChanged(0,
                     CalendarFragment.cardAdapter.getItemCount());
-
+        } else if (id == R.id.monthly_layout_item) {
+            CalendarFragment.monthlyCalendarView.setVisibility(View.VISIBLE);
+            CalendarFragment.todoListRecyclerView.setVisibility(View.INVISIBLE);
+        } else if (id == R.id.todo_list_item) {
+            CalendarFragment.monthlyCalendarView.setVisibility(View.INVISIBLE);
+            CalendarFragment.todoListRecyclerView.setVisibility(View.VISIBLE);
         }
 
         return super.onOptionsItemSelected(item);

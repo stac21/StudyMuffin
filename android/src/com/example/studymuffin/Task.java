@@ -116,6 +116,10 @@ public class Task {
         idCounter = mIdCounter;
     }
 
+    public TaskType getTaskType() {
+        return this.taskType;
+    }
+
     public ArrayList<Goal> getGoals() { return goals; }
 
     public void setGoals(ArrayList<Goal> goals) { this.goals = goals; }

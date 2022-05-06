@@ -45,6 +45,11 @@ public class BakeryMenu extends Dialog {
     }
 
     public void addItem(BakeryUpgrade item) {
+        // ensure that there are always two items per row
+        if (this.items.size() % 2 == 0) {
+            this.getContentTable().row();
+        }
+
         this.items.add(item);
 
         Table group = new Table();

@@ -13,11 +13,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -45,6 +49,7 @@ public class TaskActivity extends AppCompatActivity {
     private TextView priorityTv;
     private Spinner prioritySpinner;
     private CheckBox completedCb;
+    private TextView taskTypeTv;
 
     private View view;
     public static TaskActivity.TaskCardAdapter cardAdapter;
@@ -63,11 +68,12 @@ public class TaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task);
         Resources r = this.getResources();
 
+        final Context context = TaskActivity.this;
+
         // get the task information from the CalendarFragment's intent
         Intent i = this.getIntent();
         String json = i.getStringExtra("com.example.studymuffin.task");
-        Type collectionType = new TypeToken<Task>(){}.getType();
-        Task task = new Gson().fromJson(json, collectionType);
+        final Task task = CalendarFragment.convertJsonToTask(json);
 
         ArrayList<Goal> goalList = new ArrayList<>();
         cardAdapter = new TaskCardAdapter(goalList);
@@ -84,6 +90,8 @@ public class TaskActivity extends AppCompatActivity {
 
         this.nameEt.setText(task.getName());
         this.descriptionEt.setText(task.getDescription());
+        this.taskTypeTv.setText(this.taskTypeTv.getText().toString() + ": " +
+                task.getTaskType().toString());
         // sets the date and trims it to only contain the day of week and date
         this.dateTv.setText(this.trimDateStr(task.getDate()));
         this.startTimeTv.setText(this.getAmPmFormat(task.getStartTimeHour(), task.getStartTimeMinute()));
@@ -93,6 +101,98 @@ public class TaskActivity extends AppCompatActivity {
         this.completedCb.setChecked(task.isCompleted());
 
         addGoal = this.findViewById(R.id.add_goal);
+
+        this.notifyCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                task.setNotify(isChecked);
+            }
+        });
+
+        if (task instanceof Assignment || task instanceof Assessment) {
+            completedCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        View v = getLayoutInflater().inflate(R.layout.checked_dialog, null);
+
+                        final EditText pointsEarnedEt = v.findViewById(R.id.points_earned_et);
+
+                        builder.setTitle(R.string.add_points);
+                        builder.setView(v);
+                        builder.setCancelable(true);
+
+                        builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+                        dialog.setTitle(R.string.add_points);
+                        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface dialogInterface) {
+                                Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                positiveButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        String pointsEarnedStr = pointsEarnedEt.getText().toString();
+
+                                        if (pointsEarnedStr.length() != 0) {
+                                            float points = Float.parseFloat(pointsEarnedStr);
+
+                                            if (task instanceof Assignment) {
+                                                Assignment a = (Assignment) task;
+
+                                                if (points <= a.getPointsPossible()) {
+                                                    a.setPointsEarned(points);
+
+                                                    CalendarFragment.saveTask(context, a);
+
+                                                    dialog.dismiss();
+                                                } else {
+                                                    Toast.makeText(context,
+                                                            R.string.points_earned_greater,
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            } else {
+                                                Assessment a = (Assessment) task;
+
+                                                if (points <= a.getPointsPossible()) {
+                                                    a.setPointsEarned(points);
+
+                                                    CalendarFragment.saveTask(context, a);
+
+                                                    dialog.dismiss();
+                                                } else {
+                                                    Toast.makeText(context,
+                                                            R.string.points_earned_greater,
+                                                            Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(context, R.string.empty_points_earned,
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        dialog.show();
+                    }
+                }
+            });
+        }
 
         // set up the priority spinner
         final String[] priorities = r.getStringArray(R.array.priority_array);
@@ -119,6 +219,7 @@ public class TaskActivity extends AppCompatActivity {
 
             }
         });
+
         addGoal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View fabView) {
@@ -164,20 +265,24 @@ public class TaskActivity extends AppCompatActivity {
         return df.format(date);
     }
 
-    private String getAmPmFormat(int hour, int minute) {
+    /**
+     * turns the hour and minute to AM PM time format
+     * @param hour the hour
+     * @param minute the minute
+     * @return a string representation of the time in AM PM format
+     */
+    public static String getAmPmFormat(int hour, int minute) {
         String time = "";
-        // the hour passed in is in 24 hour format so convert the hour to am pm format
-        // TODO fix bug where the hour doesn't display when the hour is 12
+
         int convertedHour = (hour > 12) ? hour - 12 : hour;
 
-        if (convertedHour < 10) {
-            time += "0" + convertedHour;
-        }
-
+        time += convertedHour;
         time += ":";
 
         if (minute < 10) {
             time += "0" + minute;
+        } else {
+            time += minute;
         }
 
         time += (hour < 12) ? " AM" : " PM";
@@ -198,6 +303,8 @@ public class TaskActivity extends AppCompatActivity {
         MenuItem editItem = menu.findItem(R.id.edit_item);
         MenuItem saveItem = menu.findItem(R.id.save_item);
         MenuItem cancelItem = menu.findItem(R.id.cancel_item);
+
+
 
         return super.onPrepareOptionsMenu(menu);
     }
