@@ -214,7 +214,6 @@ public class NotesFragment extends Fragment {
 
     @Override
     public void onResume() {
-        Toast.makeText(getView().getContext(), "Hi", Toast.LENGTH_LONG).show();
         super.onResume();
         list = new ArrayList<>();
         titleList = new HashSet<>();
@@ -271,8 +270,6 @@ public class NotesFragment extends Fragment {
         //Access Note by clicking on the note card
         @Override
         public void onClick(View v) {
-            Toast.makeText(v.getContext(), "Card Clicked", Toast.LENGTH_SHORT).show();
-
             Intent i = new Intent(v.getContext(), NoteActivity.class);
             this.titleString = titleTextView.getText().toString();
             i.putExtra("com.example.studymuffin.NotesFragment", titleString);

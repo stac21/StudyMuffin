@@ -155,7 +155,11 @@ public class PhysicalMeetingDialog {
                     dpDialog.show();
                 } else {
                     Calendar date = Calendar.getInstance();
-                    date.set(Calendar.DAY_OF_WEEK, position);
+                    date.set(Calendar.WEEK_OF_MONTH, date.get(Calendar.WEEK_OF_MONTH) + 1);
+                    date.set(Calendar.DAY_OF_WEEK, position + 1);
+                    date.set(Calendar.HOUR_OF_DAY, selectedStartHour);
+                    date.set(Calendar.MINUTE, selectedStartMinute);
+                    date.set(Calendar.SECOND, 0);
 
                     selectedDate = date.getTime();
                 }
@@ -198,11 +202,12 @@ public class PhysicalMeetingDialog {
                         String locationStr = locationET.getText().toString();
                         // TODO: make a spinner to choose the priority of the task
                         Priority priority = Priority.LOW;
+                        Date currentDate = Calendar.getInstance().getTime();
 
                         Context context = fView.getContext();
 
                         if (name.length() != 0 && description.length() != 0 &&
-                            locationStr.length() != 0) {
+                            locationStr.length() != 0 && selectedDate.compareTo(currentDate) > 0) {
                             Task task = new PhysicalMeeting(name, description, selectedDate,
                                     selectedStartHour, selectedStartMinute, notifyCB.isChecked(),
                                     recurringCB.isSelected(), selectedEndHour, selectedEndMinute,

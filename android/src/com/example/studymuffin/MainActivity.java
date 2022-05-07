@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText lastName = this.findViewById(R.id.lastName);
         final TextView incorrectUsernamePassword = this.findViewById(R.id.incorrectUsernamePassword);
 
-        loadFragment(currentFragment);
+        // loadFragment(currentFragment);
 
         mAuth = FirebaseAuth.getInstance();
         userAccount = Account.loadAccount(MainActivity.this);
@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 confirmPasswordET.setVisibility(View.INVISIBLE);
                 registerButton.setVisibility(View.INVISIBLE);
                 studMuffin.setVisibility(View.INVISIBLE);
+
+                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
+                loadFragment(calendarItem);
             }
         });
 
@@ -123,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
                 signInButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
                 registerButton.setVisibility(View.INVISIBLE);
+
+                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
+                loadFragment(calendarItem);
             }
         });
 
@@ -184,15 +190,20 @@ public class MainActivity extends AppCompatActivity {
         guestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                createAccountButton.setVisibility(View.INVISIBLE);
+                bottomNav.setVisibility(View.VISIBLE);
+                createProfile.setVisibility(View.INVISIBLE);
+                lastName.setVisibility(View.INVISIBLE);
+                firstName.setVisibility(View.INVISIBLE);
+                signInButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
-                createProfile.setVisibility(View.VISIBLE);
-                lastName.setVisibility(View.VISIBLE);
-                firstName.setVisibility(View.VISIBLE);
                 emailET.setVisibility(View.INVISIBLE);
                 passwordET.setVisibility(View.INVISIBLE);
+                confirmPasswordET.setVisibility(View.INVISIBLE);
+                registerButton.setVisibility(View.INVISIBLE);
+                studMuffin.setVisibility(View.INVISIBLE);
+
+                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
+                loadFragment(calendarItem);
             }
         });
 
@@ -217,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        loadFragment(item.getItemId());
+                        loadFragment(item);
 
                         return true;
                     }
@@ -225,11 +236,11 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    public void loadFragment(int itemId) {
+    public void loadFragment(MenuItem item) {
         Fragment selectedFragment = null;
+        int itemId = item.getItemId();
         currentFragment = itemId;
-        //MenuItem item = this.bottomNav.getMenu().findItem(itemId);
-        //item.setChecked(true);
+        item.setChecked(true);
 
         if (MainActivity.isInCalendarFragment) {
             MainActivity.isInCalendarFragment = false;

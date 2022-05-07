@@ -40,7 +40,7 @@
     <string name="due_date">Due Date</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
-    <string name="empty_fields">You must fill out all of the fields to create a task</string>
+    <string name="empty_fields">You must fill out all of the fields and choose a later date to create a task</string>
     <string name="day_dialog_empty">You must choose at least one day</string>
     <string name="time_dialog_title">Select Time</string>
     <string name="notify">Notify Me</string>
