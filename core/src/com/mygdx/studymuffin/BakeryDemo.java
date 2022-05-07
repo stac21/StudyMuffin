@@ -32,8 +32,9 @@ public class BakeryDemo extends ApplicationAdapter {
 	// gets the json file from the onResume method and loads the upgrades from it
 	public static String upgradesJson;
 	private Label moneyLabel;
-	private static int money;
-	private static float moneyMultiplier;
+	public static float money;
+	public static float moneyMultiplier;
+	public static int studyPoints;
 	private float time;
 	public static int WORLD_WIDTH;
 	public static int WORLD_HEIGHT;
@@ -52,26 +53,27 @@ public class BakeryDemo extends ApplicationAdapter {
 	public static final String BACKGROUND_IMG = "background.jpg";
 	public static final String BRONZE_OVEN_IMG = "bronze_oven.png";
 	public static final String SILVER_OVEN_IMG = "silver_oven.png";
-	public static final String GOLD_OVEN_IMG = "gold_oven.png";
+	public static final String GOLDEN_OVEN_IMG = "golden_oven.png";
 	public static final String MALE_CHEF_IMG = "male_chef.png";
 	public static final String FEMALE_CHEF_IMG = "female_chef.png";
 
 	// names of the upgrades
 	public static final String BRONZE_OVEN_NAME = "Bronze Oven";
 	public static final String SILVER_OVEN_NAME = "Silver Oven";
+	public static final String GOLDEN_OVEN_NAME = "Golden Oven";
 	public static final String CHEF_NAME = "Chef";
 
 	// money multipliers
-	public static final int BRONZE_OVEN_MULTIPLIER = 1;
-	public static final int SILVER_OVEN_MULTIPLIER = 2;
-	public static final int CHEF_MULTIPLIER = 3;
+	public static final float BRONZE_OVEN_MULTIPLIER = 1;
+	public static final float SILVER_OVEN_MULTIPLIER = 1.5f;
+	public static final float GOLDEN_OVEN_MULTIPLIER = 2;
+	public static final float CHEF_MULTIPLIER = 2;
 
 	// prices
 	public static final int BRONZE_OVEN_PRICE = 0;
-	public static final int SILVER_OVEN_PRICE = 10;
-	public static final int CHEF_PRICE = 20;
-
-	// coordinates
+	public static final int SILVER_OVEN_PRICE = 1000;
+	public static final int GOLDEN_OVEN_PRICE = 3000;
+	public static final int CHEF_PRICE = 5000;
 
 	// widths and heights
 	public static final int OVEN_WIDTH = 200, OVEN_HEIGHT = 200;
@@ -122,12 +124,9 @@ public class BakeryDemo extends ApplicationAdapter {
 			System.out.println(upgrades);
 		} else {
 			upgrades = new ArrayList<>();
-		}
 
-
-		if (upgrades.size() == 0) {
 			upgrades.add(new BakeryUpgrade(BRONZE_OVEN_IMG, BRONZE_OVEN_NAME, BRONZE_OVEN_MULTIPLIER,
-					BRONZE_OVEN_PRICE, WORLD_WIDTH / 2, WORLD_HEIGHT - 2 * OVEN_HEIGHT,
+					BRONZE_OVEN_PRICE, (int) (WORLD_WIDTH / 1.5), WORLD_HEIGHT - 2 * OVEN_HEIGHT,
 					OVEN_WIDTH, OVEN_HEIGHT));
 		}
 
@@ -144,11 +143,17 @@ public class BakeryDemo extends ApplicationAdapter {
 
 		final BakeryMenu bakeryMenu = new BakeryMenu("Bakery Menu", this.skin);
 		bakeryMenu.addItem(new BakeryUpgrade(SILVER_OVEN_IMG, SILVER_OVEN_NAME,
-				SILVER_OVEN_MULTIPLIER, SILVER_OVEN_PRICE, WORLD_WIDTH / 4,
+				SILVER_OVEN_MULTIPLIER, SILVER_OVEN_PRICE, WORLD_WIDTH / 2 - OVEN_WIDTH / 2,
+				WORLD_HEIGHT - 2 * OVEN_HEIGHT, OVEN_WIDTH, OVEN_HEIGHT));
+		bakeryMenu.addItem(new BakeryUpgrade(GOLDEN_OVEN_IMG, GOLDEN_OVEN_NAME,
+				GOLDEN_OVEN_MULTIPLIER, GOLDEN_OVEN_PRICE, WORLD_WIDTH / 5 - OVEN_WIDTH / 2,
 				WORLD_HEIGHT - 2 * OVEN_HEIGHT, OVEN_WIDTH, OVEN_HEIGHT));
 		bakeryMenu.addItem(new BakeryUpgrade(MALE_CHEF_IMG, CHEF_NAME, CHEF_MULTIPLIER,
-				CHEF_PRICE, (int) (WORLD_WIDTH / 1.5), WORLD_HEIGHT - CHEF_HEIGHT, CHEF_WIDTH,
+				CHEF_PRICE, CHEF_WIDTH / 2, WORLD_HEIGHT - 2 * OVEN_HEIGHT, CHEF_WIDTH,
 				CHEF_HEIGHT));
+		bakeryMenu.addItem(new BakeryUpgrade(FEMALE_CHEF_IMG, CHEF_NAME, CHEF_MULTIPLIER,
+				CHEF_PRICE, WORLD_WIDTH - (int) (CHEF_WIDTH * 1.5),
+				WORLD_HEIGHT - 2 * OVEN_HEIGHT, CHEF_WIDTH, CHEF_HEIGHT));
 
 		textButton.addListener(new ClickListener() {
 			@Override
@@ -228,19 +233,7 @@ public class BakeryDemo extends ApplicationAdapter {
 	}
 
 	public static void addUpgradeToWorld(BakeryUpgrade upgrade) {
-		if (!upgrades.contains(upgrade)) {
-			upgrades.add(upgrade);
-			moneyMultiplier *= upgrade.getMoneyMultiplier();
-		} else {
-			System.out.println("Upgrade already purchased");
-		}
-	}
-
-	public int getMoney() {
-		return money;
-	}
-
-	public void setMoney(int mMoney) {
-		money = mMoney;
+		upgrades.add(upgrade);
+		moneyMultiplier *= upgrade.getMoneyMultiplier();
 	}
 }

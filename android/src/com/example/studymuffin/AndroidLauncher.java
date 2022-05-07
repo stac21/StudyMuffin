@@ -39,7 +39,7 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 		private static BakeryDemo demo;
 		private View view;
 		public static String MONEY_FILE = "com.example.studymuffin.money_file";
-		public static String UPGRADES_FILE = "com.example.studymuffin.new_upgrades_file";
+		public static String UPGRADES_FILE = "com.example.studymuffin.upgrades_file";
 		FirebaseDatabase database;
 		DatabaseReference moneyRef;
 
@@ -56,7 +56,7 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 				@Override
 				public void onDataChange(@NonNull DataSnapshot snapshot) {
 					int value = snapshot.getValue(Integer.class);
-					demo.setMoney(value);
+					BakeryDemo.money = value;
 				}
 
 				@Override
@@ -78,12 +78,15 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 
 			String json = new Gson().toJson(BakeryDemo.upgrades);
 
-			editor.putInt(MONEY_FILE, demo.getMoney());
 			editor.putString(UPGRADES_FILE, json);
 
 			editor.apply();
 
-			moneyRef.setValue(demo.getMoney());
+			MainActivity.profile.setBakeryMoney(BakeryDemo.money);
+			MainActivity.profile.setPoints(BakeryDemo.studyPoints);
+			MainActivity.profile.save(this.view.getContext());
+
+			moneyRef.setValue(BakeryDemo.money);
 		}
 
 		@Override
@@ -93,10 +96,13 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 			System.out.println("OnResume called");
 
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.view.getContext());
-			int money = sp.getInt(MONEY_FILE, 0);
+
+			float money = MainActivity.profile.getnumBakeryMoney();
+			int studyPoints = MainActivity.profile.getNumPoints();
 			String json = sp.getString(UPGRADES_FILE, null);
 
-			demo.setMoney(money);
+			BakeryDemo.money = money;
+			BakeryDemo.studyPoints = studyPoints;
 			BakeryDemo.upgradesJson = json;
 		}
 	}

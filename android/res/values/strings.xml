@@ -10,8 +10,9 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <!-- Bakery Strings -->
+    <!-- Bakery Fragment Strings -->
     <string name="open_bakery">Open Bakery</string>
+    <string name="study_points_earned">Study Points Earned:</string>
 
     <!-- Timer strings -->
     <string name="separator_string">:</string>
@@ -39,7 +40,7 @@
     <string name="due_date">Due Date</string>
     <string name="cancel">Cancel</string>
     <string name="create">Create</string>
-    <string name="empty_fields">You must fill out all of the fields to create a task</string>
+    <string name="empty_fields">You must fill out all of the fields and choose a later date to create a task</string>
     <string name="day_dialog_empty">You must choose at least one day</string>
     <string name="time_dialog_title">Select Time</string>
     <string name="notify">Notify Me</string>
@@ -50,6 +51,16 @@
     <string name="points_possible">Points Possible</string>
     <string name="priority">Priority</string>
     <string name="create_course">You must create a course before creating a task</string>
+
+    <!-- Checked dialog strings -->
+    <string name="points_earned">Points Earned</string>
+    <string name="add_points">Add Points</string>
+    <string name="empty_points_earned">You must input points earned</string>
+    <string name="points_earned_greater">Points earned cannot be greater than points possible</string>
+
+    <!-- Task activity strings -->
+    <string name="completed">Completed</string>
+    <string name="task_type">Task Type</string>
 
     <!-- priority strings -->
     <string-array name="priority_array">

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,5 +36,14 @@ public class BakeryFragment extends Fragment {
         });
 
         return this.view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final TextView studyPointsEarnedTv = this.view.findViewById(R.id.study_points_earned_tv);
+        studyPointsEarnedTv.setText(R.string.study_points_earned);
+        studyPointsEarnedTv.append(" " + MainActivity.profile.getNumPoints());
     }
 }

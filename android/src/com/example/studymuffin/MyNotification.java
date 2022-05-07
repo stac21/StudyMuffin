@@ -140,12 +140,6 @@ public class MyNotification {
     }
 
     private static int getOffsetInMillis(String value, String[] values) {
-        System.out.println("Value: " + value);
-        System.out.println("Values: ");
-        for (int i = 0; i < values.length; i++) {
-            System.out.println("Value " + i + ": " + values[i]);
-        }
-
         if (value.equals(values[0])) {
             return 0;
         } else if (value.equals(values[1])) {
