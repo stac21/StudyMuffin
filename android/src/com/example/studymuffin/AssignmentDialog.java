@@ -29,6 +29,7 @@ public class AssignmentDialog {
     ArrayList<CourseInfo> courseList;
     private static int selectedHour, selectedMinute;
     private static Date selectedDate;
+    private static Calendar date;
     private static Priority priority;
     private static final int CUSTOM_DATE_POS = 8;
     private static final int YEAR_OFFSET = 1900;
@@ -120,14 +121,9 @@ public class AssignmentDialog {
                     dpDialog.setTitle("Select Date");
                     dpDialog.show();
                 } else {
-                    Calendar date = Calendar.getInstance();
+                    date = Calendar.getInstance();
                     date.set(Calendar.WEEK_OF_MONTH, date.get(Calendar.WEEK_OF_MONTH) + 1);
                     date.set(Calendar.DAY_OF_WEEK, position + 1);
-                    date.set(Calendar.HOUR_OF_DAY, selectedHour);
-                    date.set(Calendar.MINUTE, selectedMinute);
-                    date.set(Calendar.SECOND, 0);
-
-                    selectedDate = date.getTime();
                 }
             }
 
@@ -193,6 +189,12 @@ public class AssignmentDialog {
                         String description = descriptionET.getText().toString();
                         String pointsStr = pointsET.getText().toString();
                         Date currentDate = Calendar.getInstance().getTime();
+
+                        date.set(Calendar.HOUR_OF_DAY, selectedHour);
+                        date.set(Calendar.MINUTE, selectedMinute);
+                        date.set(Calendar.SECOND, 0);
+                        selectedDate = date.getTime();
+                        System.out.println("selectedDate: " + selectedDate.toString());
 
                         System.out.println("Name: " + name);
                         System.out.println("Desc: " + description);

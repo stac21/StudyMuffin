@@ -110,6 +110,8 @@ public class CalendarFragment extends Fragment {
         monthLabel.setText(months[currentMonth]);
         populateCalendar(cardAdapter.getTaskList());
 
+        monthlyCalendarView.shouldScrollMonth(false);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View fabView) {
