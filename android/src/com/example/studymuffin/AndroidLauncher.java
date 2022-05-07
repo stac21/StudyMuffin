@@ -56,7 +56,7 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 				@Override
 				public void onDataChange(@NonNull DataSnapshot snapshot) {
 					int value = snapshot.getValue(Integer.class);
-					demo.setMoney(value);
+					BakeryDemo.money = value;
 				}
 
 				@Override
@@ -78,12 +78,15 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 
 			String json = new Gson().toJson(BakeryDemo.upgrades);
 
-			editor.putFloat(MONEY_FILE, demo.getMoney());
 			editor.putString(UPGRADES_FILE, json);
 
 			editor.apply();
 
-			moneyRef.setValue(demo.getMoney());
+			MainActivity.profile.setBakeryMoney(BakeryDemo.money);
+			MainActivity.profile.setPoints(BakeryDemo.studyPoints);
+			MainActivity.profile.save(this.view.getContext());
+
+			moneyRef.setValue(BakeryDemo.money);
 		}
 
 		@Override
@@ -94,10 +97,12 @@ public class AndroidLauncher extends FragmentActivity implements AndroidFragment
 
 			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.view.getContext());
 
-			float money = sp.getFloat(MONEY_FILE, 0.0f);
+			float money = MainActivity.profile.getnumBakeryMoney();
+			int studyPoints = MainActivity.profile.getNumPoints();
 			String json = sp.getString(UPGRADES_FILE, null);
 
-			demo.setMoney(money);
+			BakeryDemo.money = money;
+			BakeryDemo.studyPoints = studyPoints;
 			BakeryDemo.upgradesJson = json;
 		}
 	}

@@ -32,8 +32,9 @@ public class BakeryDemo extends ApplicationAdapter {
 	// gets the json file from the onResume method and loads the upgrades from it
 	public static String upgradesJson;
 	private Label moneyLabel;
-	private static float money;
-	private static float moneyMultiplier;
+	public static float money;
+	public static float moneyMultiplier;
+	public static int studyPoints;
 	private float time;
 	public static int WORLD_WIDTH;
 	public static int WORLD_HEIGHT;
@@ -70,9 +71,9 @@ public class BakeryDemo extends ApplicationAdapter {
 
 	// prices
 	public static final int BRONZE_OVEN_PRICE = 0;
-	public static final int SILVER_OVEN_PRICE = 10;
-	public static final int GOLDEN_OVEN_PRICE = 30;
-	public static final int CHEF_PRICE = 50;
+	public static final int SILVER_OVEN_PRICE = 1000;
+	public static final int GOLDEN_OVEN_PRICE = 3000;
+	public static final int CHEF_PRICE = 5000;
 
 	// widths and heights
 	public static final int OVEN_WIDTH = 200, OVEN_HEIGHT = 200;
@@ -232,19 +233,7 @@ public class BakeryDemo extends ApplicationAdapter {
 	}
 
 	public static void addUpgradeToWorld(BakeryUpgrade upgrade) {
-		if (!upgrades.contains(upgrade)) {
-			upgrades.add(upgrade);
-			moneyMultiplier *= upgrade.getMoneyMultiplier();
-		} else {
-			System.out.println("Upgrade already purchased");
-		}
-	}
-
-	public float getMoney() {
-		return money;
-	}
-
-	public void setMoney(float mMoney) {
-		money = mMoney;
+		upgrades.add(upgrade);
+		moneyMultiplier *= upgrade.getMoneyMultiplier();
 	}
 }

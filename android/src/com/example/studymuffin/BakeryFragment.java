@@ -24,10 +24,7 @@ public class BakeryFragment extends Fragment {
 
         Context context = this.view.getContext();
 
-        final TextView studyPointsEarnedTv = this.view.findViewById(R.id.study_points_earned_tv);
         final Button shopButton = this.view.findViewById(R.id.bakery_shop_button);
-
-        studyPointsEarnedTv.append(" " + MainActivity.profile.getNumPoints());
 
         shopButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,5 +36,14 @@ public class BakeryFragment extends Fragment {
         });
 
         return this.view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final TextView studyPointsEarnedTv = this.view.findViewById(R.id.study_points_earned_tv);
+        studyPointsEarnedTv.setText(R.string.study_points_earned);
+        studyPointsEarnedTv.append(" " + MainActivity.profile.getNumPoints());
     }
 }

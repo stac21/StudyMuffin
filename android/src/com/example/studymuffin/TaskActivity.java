@@ -61,6 +61,8 @@ public class TaskActivity extends AppCompatActivity {
     public static int selectedCardPosition;
 
     public static final String GOAL_FILE = "com.example.studymuffin.goal_file";
+    // the amount of points to reward the user when they finish a task
+    public static final int NUM_POINTS = 1000;
 
     public FloatingActionButton addGoal;
     private String m_Text;
@@ -139,11 +141,13 @@ public class TaskActivity extends AppCompatActivity {
                         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                completedCb.setChecked(false);
                             }
                         });
 
                         AlertDialog dialog = builder.create();
                         dialog.setTitle(R.string.add_points);
+                        dialog.setCanceledOnTouchOutside(false);
                         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                             @Override
                             public void onShow(DialogInterface dialogInterface) {
@@ -165,6 +169,9 @@ public class TaskActivity extends AppCompatActivity {
                                                     CalendarFragment.saveTask(context, a);
 
                                                     dialog.dismiss();
+
+                                                    MainActivity.profile.addPoints(NUM_POINTS);
+                                                    MainActivity.profile.save(context);
                                                 } else {
                                                     Toast.makeText(context,
                                                             R.string.points_earned_greater,
@@ -179,6 +186,9 @@ public class TaskActivity extends AppCompatActivity {
                                                     CalendarFragment.saveTask(context, a);
 
                                                     dialog.dismiss();
+
+                                                    MainActivity.profile.addPoints(NUM_POINTS);
+                                                    MainActivity.profile.save(context);
                                                 } else {
                                                     Toast.makeText(context,
                                                             R.string.points_earned_greater,

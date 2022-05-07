@@ -71,9 +71,8 @@ public class CalendarFragment extends Fragment {
         final FloatingActionButton fab = view.findViewById(R.id.calendar_fab);
         final TextView monthLabel = view.findViewById(R.id.calendar_month_label);
 
-        if (monthlyCalendarView == null) {
-            monthlyCalendarView = view.findViewById(R.id.compact_calendar_view);
-        }
+        monthlyCalendarView = view.findViewById(R.id.compact_calendar_view);
+
         if (sortPreference == null) {
             System.out.println("sortPreference is null");
             sortPreference = loadSortPreference(context);

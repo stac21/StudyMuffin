@@ -67,11 +67,24 @@ public class BakeryMenu extends Dialog {
         group.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                BakeryDemo.addUpgradeToWorld(finalItem);
+                if (BakeryDemo.studyPoints >= finalItem.getPrice() && isUpgradePurchased(finalItem)) {
+                    BakeryDemo.addUpgradeToWorld(finalItem);
+                    BakeryDemo.studyPoints -= finalItem.getPrice();
+                }
             }
         });
 
         this.getContentTable().add(group);
+    }
+
+    private static boolean isUpgradePurchased(BakeryUpgrade upgrade) {
+        for (int i = 0; i < BakeryDemo.upgrades.size(); i++) {
+            if (BakeryDemo.upgrades.get(i).getName().equals(upgrade.getName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public ArrayList<BakeryUpgrade> getItems() {

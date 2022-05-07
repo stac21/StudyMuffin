@@ -14,7 +14,9 @@ public class Profile {
     private String firstName;
     private String lastName;
     private int numStudyPoints;
-    private int numBakeryMoney;
+    private float numBakeryMoney;
+    private boolean hasPurchasedPastelTheme;
+    private boolean hasPurchasedElleWoodsTheme;
     public static String PROFILE_FILE = "com.example.studymuffin.profile";
 
     public Profile(String firstName, String lastName, int numStudyPoints, int numBakeryMoney) {
@@ -22,6 +24,8 @@ public class Profile {
         this.lastName = lastName;
         this.numStudyPoints = numStudyPoints;
         this.numBakeryMoney = numBakeryMoney;
+        this.hasPurchasedPastelTheme = false;
+        this.hasPurchasedElleWoodsTheme = false;
     }
 
     public String getFirstName() {
@@ -52,16 +56,40 @@ public class Profile {
         this.numStudyPoints -= numStudyPoints;
     }
 
-    public int getnumBakeryMoney() {
+    public void setPoints(int numStudyPoints) {
+        this.numStudyPoints = numStudyPoints;
+    }
+
+    public float getnumBakeryMoney() {
         return numBakeryMoney;
     }
 
-    public void addBakeryMoney(int numBakeryMoney) {
+    public void addBakeryMoney(float numBakeryMoney) {
         this.numBakeryMoney += numBakeryMoney;
     }
 
-    public void substractBakeryMoney(int numBakeryMoney) {
+    public void substractBakeryMoney(float numBakeryMoney) {
         this.numBakeryMoney -= numBakeryMoney;
+    }
+
+    public void setBakeryMoney(float numBakeryMoney) {
+        this.numBakeryMoney = numBakeryMoney;
+    }
+
+    public boolean hasPurchasedPastelTheme() {
+        return hasPurchasedPastelTheme;
+    }
+
+    public void setHasPurchasedPastelTheme(boolean hasPurchasedPastelTheme) {
+        this.hasPurchasedPastelTheme = hasPurchasedPastelTheme;
+    }
+
+    public boolean hasPurchasedElleWoodsTheme() {
+        return hasPurchasedElleWoodsTheme;
+    }
+
+    public void setHasPurchasedElleWoodsTheme(boolean hasPurchasedElleWoodsTheme) {
+        this.hasPurchasedElleWoodsTheme = hasPurchasedElleWoodsTheme;
     }
 
     /**

@@ -48,14 +48,13 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     // public static Profile profile = new Profile("Profile", "One", 0, 0);
     public static Profile profile;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SettingsActivity.setThemeOfApp(this);
         setContentView(R.layout.activity_main);
-
-        loadFragment(currentFragment);
 
         final Button signInButton = this.findViewById(R.id.signInButton);
 
@@ -64,13 +63,15 @@ public class MainActivity extends AppCompatActivity {
         final Button createAccountButton = this.findViewById(R.id.createAccountButton);
         final EditText emailET = this.findViewById(R.id.emailEditText);
         final EditText passwordET = this.findViewById(R.id.passwordEditText);
-        final BottomNavigationView bottomNav = this.findViewById(R.id.bottom_nav_view);
+        this.bottomNav = this.findViewById(R.id.bottom_nav_view);
         final EditText confirmPasswordET = this.findViewById(R.id.confirmPasswordEditText);
         final ImageView studMuffin = this.findViewById(R.id.main_stud_muffin);
         final Button createProfile = this.findViewById(R.id.createProfile);
         final EditText firstName = this.findViewById(R.id.firstName);
         final EditText lastName = this.findViewById(R.id.lastName);
         final TextView incorrectUsernamePassword = this.findViewById(R.id.incorrectUsernamePassword);
+
+        loadFragment(currentFragment);
 
         mAuth = FirebaseAuth.getInstance();
         userAccount = Account.loadAccount(MainActivity.this);
@@ -227,6 +228,8 @@ public class MainActivity extends AppCompatActivity {
     public void loadFragment(int itemId) {
         Fragment selectedFragment = null;
         currentFragment = itemId;
+        //MenuItem item = this.bottomNav.getMenu().findItem(itemId);
+        //item.setChecked(true);
 
         if (MainActivity.isInCalendarFragment) {
             MainActivity.isInCalendarFragment = false;
