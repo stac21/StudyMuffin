@@ -24,14 +24,8 @@
                 android:visible="true"
                 app:showAsAction="never"/>
             <item
-                android:id="@+id/weekly_layout_item"
-                android:orderInCategory="1"
-                android:title="@string/weekly_layout_item"
-                android:visible="true"
-                app:showAsAction="never"/>
-            <item
                 android:id="@+id/todo_list_item"
-                android:orderInCategory="2"
+                android:orderInCategory="1"
                 android:title="@string/todo_list_item"
                 android:visible="true"
                 app:showAsAction="never"/>
