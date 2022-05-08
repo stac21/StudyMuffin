@@ -30,11 +30,41 @@
         android:hint="Location"/>
 
     <EditText
-        android:id="@+id/day_time_et"
-        android:layout_below= "@id/location_et"
+        android:id="@+id/day_et"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Days and time"/>
+        android:layout_below="@id/location_et"
+        android:hint="Days"/>
+
+    <TextView
+        android:id="@+id/startTimeSpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/day_et"
+        android:text="@string/start_time"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/startTimeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/day_et"
+        android:layout_toEndOf="@id/startTimeSpinnerTextView"/>
+
+    <TextView
+        android:id="@+id/endTimeSpinnerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/startTimeSpinnerTextView"
+        android:text="@string/end_time"
+        android:textSize="18sp"
+        android:padding="10dp"/>
+    <Spinner
+        android:id="@+id/endTimeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/startTimeSpinnerTextView"
+        android:layout_toEndOf="@id/endTimeSpinnerTextView"/>
 
 
 

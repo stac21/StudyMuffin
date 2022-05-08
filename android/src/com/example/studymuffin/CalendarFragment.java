@@ -332,7 +332,12 @@ public class CalendarFragment extends Fragment {
             isCardSelected = true;
             selectedCardPosition = this.getAdapterPosition();
 
-            CalendarFragment.this.getActivity().invalidateOptionsMenu();
+            try {
+                getActivity().invalidateOptionsMenu();
+            } catch (NullPointerException e) {
+                Toast.makeText(v.getContext(), "Try reloading the application",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             return true;
         }

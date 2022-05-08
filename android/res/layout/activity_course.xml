@@ -58,14 +58,4 @@
         android:layout_below="@id/classLink"
         android:layout_alignParentLeft="true"/>
 
-    <TextView
-        android:id="@+id/classColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Color: "
-        android:textSize="20dp"
-        android:padding="5dp"
-        android:layout_below="@id/classSchedule"
-        android:layout_alignParentLeft="true"/>
-
 </RelativeLayout>
