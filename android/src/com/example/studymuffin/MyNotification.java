@@ -52,12 +52,6 @@ public class MyNotification {
         PendingIntent taskPi = PendingIntent.getBroadcast(context, TASK_REQUEST_CODE, taskIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent checkIntent = new Intent(context, AlarmReceiver.class);
-        checkIntent.putExtra(CHECK_INTENT, json);
-        checkIntent.setAction(CHECK_ACTION);
-        PendingIntent checkPi = PendingIntent.getBroadcast(context, CHECK_REQUEST_CODE,
-                checkIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         this.builder = new NotificationCompat.Builder(context,
                 CHANNEL_ID);
 
@@ -80,10 +74,6 @@ public class MyNotification {
 
         this.builder.setDefaults(NotificationCompat.DEFAULT_LIGHTS);
         this.builder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
-
-        // create the check button on the notification and it's action
-        String checkStr = context.getString(R.string.check_str);
-        this.builder.addAction(R.drawable.ic_baseline_check_24, checkStr, checkPi);
 
         nm.notify(task.getUniqueId(), this.builder.build());
     }
