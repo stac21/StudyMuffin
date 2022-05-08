@@ -29,8 +29,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -38,6 +42,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClassFragment extends Fragment {
     private View view;
@@ -60,9 +66,7 @@ public class ClassFragment extends Fragment {
         Context context = this.view.getContext();
         Resources r = context.getResources();
 
-        if (cardAdapter == null) {
-            cardAdapter = new CardAdapter(loadCourseList(context));
-        }
+        cardAdapter = new CardAdapter(loadCourseList(context));
 
         final String[] times = r.getStringArray(R.array.time_spinner_array);
         CourseInfo.idCounter = loadCourseIdCounter(context);
@@ -334,38 +338,103 @@ public class ClassFragment extends Fragment {
 
     public static ArrayList<CourseInfo> loadCourseList(Context context) {
         Type collectionType = new TypeToken<ArrayList<CourseInfo>>(){}.getType();
-        ArrayList<CourseInfo> courseList = new ArrayList<>();
+        final ArrayList<CourseInfo> courseList = new ArrayList<>();
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
+            CollectionReference ref = db.collection("Data")
+                    .document("CourseData")
+                    .collection(MainActivity.firebaseUser.getEmail());
 
+            DocumentReference dataRef = ref.document(COURSE_FILE);
+            dataRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+
+                        if (document.exists()) {
+                            Map<String, Object> data = document.getData();
+
+                            if (data.get(COURSE_ID_COUNTER_FILE) != null) {
+                                CourseInfo.idCounter = Math.toIntExact((long)data.get(COURSE_ID_COUNTER_FILE));
+                            }
+
+                            String dataJson = (String) data.get(COURSE_FILE);
+                            System.out.println("Course Json: " + dataJson);
+                            ArrayList<CourseInfo> loadedCourseList = new Gson().fromJson(dataJson,
+                                    collectionType);
+
+                            System.out.println("loadedCourseList: ");
+
+                            for (CourseInfo ci : loadedCourseList) {
+                                System.out.println(ci.getTitle());
+                            }
+
+                            if (loadedCourseList != null) {
+                                courseList.addAll(loadedCourseList);
+
+                                System.out.println("CourseList: ");
+
+                                for (CourseInfo ci : courseList) {
+                                    System.out.println(ci.getTitle());
+                                }
+                            }
+
+                            System.out.println("CourseList exists");
+                        } else {
+                            System.out.println("No such document");
+                        }
+                    } else {
+                        System.out.println("CourseList could not be retrieved" + task.getException());
+                    }
+                }
+            });
         } else {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
             String json = sp.getString(COURSE_FILE, null);
+            ArrayList<CourseInfo> loadedCourseList = new Gson().fromJson(json, collectionType);
 
-            courseList = new Gson().fromJson(json, collectionType);
+            if (loadedCourseList != null) {
+                courseList.addAll(new Gson().fromJson(json, collectionType));
+            }
         }
 
-        if (courseList != null) {
-            return courseList;
-        } else {
-            return new ArrayList<>();
+        System.out.println("CourseList after condition");
+        for (CourseInfo ci : courseList) {
+            System.out.println(ci.getTitle());
         }
+
+        return courseList;
     }
 
     public static void saveCourseList(Context context, ArrayList<CourseInfo> courseList) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
 
+        // save the data locally
         String json = new Gson().toJson(courseList);
 
         editor.putString(COURSE_FILE, json);
         editor.putInt(COURSE_ID_COUNTER_FILE, CourseInfo.idCounter);
 
         editor.apply();
+
+        // save the data to firebase
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference ref = db.collection("Data")
+                    .document("CourseData")
+                    .collection(MainActivity.firebaseUser.getEmail());
+
+            Map<String, Object> data = new HashMap<>();
+
+            data.put(COURSE_FILE, json);
+            data.put(COURSE_ID_COUNTER_FILE, CourseInfo.idCounter);
+
+            ref.document(COURSE_FILE).set(data);
+        }
     }
 
     public static CourseInfo getCourseAtIndex(Context context, int courseIndex) {

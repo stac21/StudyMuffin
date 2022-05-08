@@ -27,8 +27,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -38,6 +41,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CalendarFragment extends Fragment {
     private View view;
@@ -538,15 +543,49 @@ public class CalendarFragment extends Fragment {
     public static ArrayList<Task> loadTaskList(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(TASK_FILE, null);
+        final ArrayList<Task> taskList = new ArrayList<>();
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-        }
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.firebaseUser.getEmail());
 
-        ArrayList<Task> taskList = new ArrayList<>();
+            DocumentReference dataRef = ref.document(TASK_FILE);
+            dataRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
 
-        // if the save file exists, load the data
-        if (json != null) {
+                        if (document.exists()) {
+                            Map<String, Object> data = document.getData();
+
+                            if (data.get(TASK_ID_COUNTER_FILE) != null) {
+                                Task.idCounter = Math.toIntExact((long)data.get(TASK_ID_COUNTER_FILE));
+                            }
+
+                            String dataJson = (String) data.get(TASK_FILE);
+                            JsonArray jsonArray = new JsonParser().parse(dataJson).getAsJsonArray();
+                            String currentElementJson;
+
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                currentElementJson = jsonArray.get(i).toString();
+
+                                System.out.println(currentElementJson);
+
+                                taskList.add(convertJsonToTask(currentElementJson));
+                            }
+
+                            System.out.println("TaskList exists " + data);
+                        } else {
+                            System.out.println("No such document");
+                        }
+                    } else {
+                        System.out.println("TaskList could not be retrieved" + task.getException());
+                    }
+                }
+            });
+        } else {
             JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
             String currentElementJson;
 
@@ -614,7 +653,6 @@ public class CalendarFragment extends Fragment {
     public static void saveTaskList(Context context, ArrayList<Task> taskList) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // save the data locally
         String json = new Gson().toJson(taskList);
@@ -622,16 +660,20 @@ public class CalendarFragment extends Fragment {
         editor.putString(TASK_FILE, json);
         editor.putInt(TASK_ID_COUNTER_FILE, Task.idCounter);
 
-        // save the data to firebase
-        if (MainActivity.userAccount != null) {
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
-            ref.document(TASK_FILE).set(json);
-            ref.document(TASK_ID_COUNTER_FILE).set(Task.idCounter);
-        }
-
-
         editor.apply();
+
+        // save the data to firebase
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.firebaseUser.getEmail());
+            Map<String, Object> data = new HashMap<>();
+
+            data.put(TASK_FILE, json);
+            data.put(TASK_ID_COUNTER_FILE, Task.idCounter);
+
+            ref.document(TASK_FILE).set(data);
+        }
     }
 
     /**
@@ -642,13 +684,13 @@ public class CalendarFragment extends Fragment {
     public static int loadTaskIdCounter(Context context) {
         int counter = 0;
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null) {
             System.out.println("The user account is not null");
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
+                    .collection(MainActivity.firebaseUser.getEmail());
             // ref.document(TASK_FILE).get();
         } else {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

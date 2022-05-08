@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -75,7 +74,7 @@ public class NotesFragment extends Fragment {
         //titleList.add("Hello");
         SharedPreferences.Editor editor = sharedpreferences.edit();
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null) {
             ArrayList<String> titleArray
                     = new ArrayList<>();
             titleArray.addAll(titleList);

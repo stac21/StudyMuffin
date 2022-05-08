@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     public static int currentFragment = SIGN_IN_PAGE;
     public static boolean isInCalendarFragment = false;
     public static SearchView calendarSearchView;
-    public static Account userAccount;
+    public static FirebaseUser firebaseUser;
     private FirebaseAuth mAuth;
     public static Profile profile;
     private BottomNavigationView bottomNav;
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         loadFragment(currentFragment);
 
         mAuth = FirebaseAuth.getInstance();
-        userAccount = Account.loadAccount(MainActivity.this);
         profile = Profile.loadProfile(MainActivity.this);
 
         if (currentFragment != SIGN_IN_PAGE) {
@@ -90,30 +90,54 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String email = emailET.getText().toString();
+                String password = passwordET.getText().toString();
+                
+                if (email.length() != 0 && password.length() != 0) {
+                    String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
-                String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+                    Pattern pattern = Pattern.compile(regex);
 
-                Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(emailET.getText().toString());
+                    System.out.println(matcher);
+                    System.out.println("In sign in onClick");
 
-                Matcher matcher = pattern.matcher(emailET.getText().toString());
-                System.out.println(matcher);
+                    if (matcher.matches()) {
+                        mAuth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            // sign in success, update user logged in with the signed-in user's information
+                                            System.out.println("Successfully logged into account");
+                                            firebaseUser = mAuth.getCurrentUser();
 
-                if(matcher.matches() == true){
-                    bottomNav.setVisibility(View.VISIBLE);
-                }else{
-                    bottomNav.setVisibility(View.INVISIBLE);
+                                            bottomNav.setVisibility(View.VISIBLE);
+                                            signInButton.setVisibility(View.INVISIBLE);
+                                            guestButton.setVisibility(View.INVISIBLE);
+                                            emailET.setVisibility(View.INVISIBLE);
+                                            passwordET.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
+                                            registerButton.setVisibility(View.INVISIBLE);
+                                            studMuffin.setVisibility(View.INVISIBLE);
+
+                                            loadFragment(R.id.nav_calendar);
+                                        } else {
+                                            // sign in fail, notify user
+                                            System.out.println("Sign in failed");
+                                            Toast.makeText(v.getContext(), "Authentication failed.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(v.getContext(), "Enter a valid email",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "You must fill out all fields",
+                            Toast.LENGTH_SHORT).show();
                 }
-
-                signInButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                emailET.setVisibility(View.INVISIBLE);
-                passwordET.setVisibility(View.INVISIBLE);
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
-                studMuffin.setVisibility(View.INVISIBLE);
-
-                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
-                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -125,9 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 signInButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
                 registerButton.setVisibility(View.INVISIBLE);
-
-                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
-                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -136,52 +157,54 @@ public class MainActivity extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailET.getText().toString();
-                String password = passwordET.getText().toString();
+                if (emailET.getText().toString().length() != 0 && passwordET.getText().toString()
+                        .length() != 0 && confirmPasswordET.getText().toString().length() != 0) {
+                    String email = emailET.getText().toString();
+                    String password = passwordET.getText().toString();
+                    String confirmPassword = confirmPasswordET.getText().toString();
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
-                                    // save the account information locally
-                                    userAccount = new Account(email, password);
-                                    userAccount.save(MainActivity.this);
-                                } else {
-                                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
+                    //Email and Password Verification
+                    String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                createAccountButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
+                    Pattern pattern = Pattern.compile(regex);
 
+                    Matcher matcher = pattern.matcher(email);
+                    System.out.println(matcher);
 
-                //Email and Password Verification
-                String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+                    //if the email is the right format + passwords match -> the app is accessible
+                    if (matcher.matches() && password.equals(confirmPassword)) {
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                            firebaseUser = mAuth.getCurrentUser();
 
-                Pattern pattern = Pattern.compile(regex);
+                                            bottomNav.setVisibility(View.VISIBLE);
+                                            signInButton.setVisibility(View.INVISIBLE);
+                                            guestButton.setVisibility(View.INVISIBLE);
+                                            emailET.setVisibility(View.INVISIBLE);
+                                            passwordET.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
+                                            registerButton.setVisibility(View.INVISIBLE);
+                                            studMuffin.setVisibility(View.INVISIBLE);
+                                            createAccountButton.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
 
-                Matcher matcher = pattern.matcher(emailET.getText().toString());
-                System.out.println(matcher);
-
-                //if the email is the right format + passwords match -> the app is accessible
-                if(matcher.matches() == true /*&& passwordET.equals(confirmPasswordET)*/){
-                    bottomNav.setVisibility(View.VISIBLE);
-                    signInButton.setVisibility(View.INVISIBLE);
-                    guestButton.setVisibility(View.INVISIBLE);
-                    emailET.setVisibility(View.INVISIBLE);
-                    passwordET.setVisibility(View.INVISIBLE);
-                    confirmPasswordET.setVisibility(View.INVISIBLE);
-                    registerButton.setVisibility(View.INVISIBLE);
-                    studMuffin.setVisibility(View.INVISIBLE);
-                } else{
-                    bottomNav.setVisibility(View.INVISIBLE);
-                    incorrectUsernamePassword.setVisibility(View.VISIBLE);
-                    confirmPasswordET.setVisibility(View.VISIBLE);
+                                            loadFragment(R.id.nav_calendar);
+                                        } else {
+                                            Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(v.getContext(), "Your passwords do not match",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "You must fill out all fields",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -201,7 +224,6 @@ public class MainActivity extends AppCompatActivity {
                 registerButton.setVisibility(View.INVISIBLE);
                 studMuffin.setVisibility(View.INVISIBLE);
 
-                MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
                 loadFragment(R.id.nav_calendar);
             }
         });
