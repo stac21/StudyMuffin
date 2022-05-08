@@ -378,16 +378,15 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.monthly_layout_item) {
             CalendarFragment.monthlyCalendarView.setVisibility(View.VISIBLE);
             CalendarFragment.todoListRecyclerView.setVisibility(View.INVISIBLE);
-            //CalendarFragment.mWeekView.setVisibility(View.INVISIBLE);
+            CalendarFragment.mWeekView.setVisibility(View.INVISIBLE);
         } else if (id == R.id.todo_list_item) {
             CalendarFragment.monthlyCalendarView.setVisibility(View.INVISIBLE);
             CalendarFragment.todoListRecyclerView.setVisibility(View.VISIBLE);
-            //CalendarFragment.mWeekView.setVisibility(View.INVISIBLE);
-        } else if (id == R.id.weekView) {
+            CalendarFragment.mWeekView.setVisibility(View.INVISIBLE);
+        } else if (id == R.id.weekly_layout_item) {
             CalendarFragment.monthlyCalendarView.setVisibility(View.INVISIBLE);
             CalendarFragment.todoListRecyclerView.setVisibility(View.INVISIBLE);
-            //CalendarFragment.mWeekView.setVisibility(View.VISIBLE);
-
+            CalendarFragment.mWeekView.setVisibility(View.VISIBLE);
         }
 
         return super.onOptionsItemSelected(item);

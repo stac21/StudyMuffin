@@ -25,7 +25,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alamkanak.weekview.MonthLoader;
 import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewEvent;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,6 +41,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class CalendarFragment extends Fragment {
     private View view;
@@ -75,7 +78,7 @@ public class CalendarFragment extends Fragment {
             monthlyCalendarView = view.findViewById(R.id.compact_calendar_view);
         }
         if(mWeekView == null) {
-            mWeekView = view.findViewById((R.id.weekView));
+            mWeekView = view.findViewById((R.id.week_view));
         }
         if (sortPreference == null) {
             System.out.println("sortPreference is null");
@@ -112,8 +115,14 @@ public class CalendarFragment extends Fragment {
         populateCalendar(cardAdapter.getTaskList());
 
         // Get a reference for the week view in the layout.
-        //mWeekView = view.findViewById(R.id.weekView);
+        mWeekView = view.findViewById(R.id.week_view);
 
+        mWeekView.setMonthChangeListener(new MonthLoader.MonthChangeListener() {
+            @Override
+            public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+                return new ArrayList<>();
+            }
+        });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
