@@ -50,13 +50,13 @@ public class MyNotification {
         taskIntent.putExtra(TASK_INTENT, json);
         taskIntent.setAction(CLICKED_ACTION);
         PendingIntent taskPi = PendingIntent.getBroadcast(context, TASK_REQUEST_CODE, taskIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Intent checkIntent = new Intent(context, AlarmReceiver.class);
         checkIntent.putExtra(CHECK_INTENT, json);
         checkIntent.setAction(CHECK_ACTION);
         PendingIntent checkPi = PendingIntent.getBroadcast(context, CHECK_REQUEST_CODE,
-                checkIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                checkIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         this.builder = new NotificationCompat.Builder(context,
                 CHANNEL_ID);

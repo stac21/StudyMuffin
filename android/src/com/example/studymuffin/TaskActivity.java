@@ -1,5 +1,6 @@
 package com.example.studymuffin;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -20,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class TaskActivity extends AppCompatActivity {
@@ -31,18 +34,38 @@ public class TaskActivity extends AppCompatActivity {
     private TextView priorityTv;
     private Spinner prioritySpinner;
     private CheckBox completedCb;
+    private EditText pointsEarnedEt;
+    private Button saveButton;
+    private Task task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         Resources r = this.getResources();
+        Context context = TaskActivity.this;
 
         // get the task information from the CalendarFragment's intent
         Intent i = this.getIntent();
-        String json = i.getStringExtra("com.example.studymuffin.task");
-        Type collectionType = new TypeToken<Task>(){}.getType();
-        Task task = new Gson().fromJson(json, collectionType);
+        Gson gson = new Gson();
+
+        String currentElementJson = i.getStringExtra("com.example.studymuffin.task");
+        if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSIGNMENT.toString()
+                + "\"")) {
+            Assignment a = gson.fromJson(currentElementJson, Assignment.class);
+            task = a;
+        } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSESSMENT
+                .toString() + "\"")) {
+            Assessment a = gson.fromJson(currentElementJson, Assessment.class);
+            task = a;
+        } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.VIRTUAL_MEETING
+                .toString() + "\"")) {
+            VirtualMeeting vm = gson.fromJson(currentElementJson, VirtualMeeting.class);
+            task = vm;
+        } else {
+            PhysicalMeeting pm = gson.fromJson(currentElementJson, PhysicalMeeting.class);
+            task = pm;
+        }
 
         this.nameEt = this.findViewById(R.id.name_et);
         this.descriptionEt = this.findViewById(R.id.description_et);
@@ -52,6 +75,8 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv = this.findViewById(R.id.priority_tv);
         this.prioritySpinner = this.findViewById(R.id.priority_spinner);
         this.completedCb = this.findViewById(R.id.completed_cb);
+        this.pointsEarnedEt = this.findViewById(R.id.points_earned_et);
+        this.saveButton = this.findViewById(R.id.save_button);
 
         this.nameEt.setText(task.getName());
         this.descriptionEt.setText(task.getDescription());
@@ -62,6 +87,43 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
         this.completedCb.setChecked(task.isCompleted());
+        this.saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (task instanceof Assessment) {
+                    Assessment a = null;
+                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
+
+                    for (int j = 0; j < taskList.size(); j++) {
+                        if (taskList.get(j).getUniqueId() == task.getUniqueId()) {
+                            a = (Assessment) taskList.get(j);
+                        }
+                    }
+
+                    float points = Float.parseFloat(pointsEarnedEt.getText().toString());
+                    a.setPointsEarned(points);
+
+                    System.out.println(points);
+
+                    CalendarFragment.saveTaskList(context, taskList);
+                } else if (task instanceof Assignment) {
+                    Assignment a = null;
+                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
+
+                    for (int j = 0; j < taskList.size(); j++) {
+                        if (taskList.get(j).getUniqueId() == task.getUniqueId()) {
+                            a = (Assignment) taskList.get(j);
+                        }
+                    }
+
+                    a.setPointsEarned(Float.parseFloat(pointsEarnedEt.getText().toString()));
+                    CalendarFragment.saveTaskList(context, taskList);
+                }
+            }
+        });
+
+
+
 
         // set up the priority spinner
         final String[] priorities = r.getStringArray(R.array.priority_array);

@@ -11,12 +11,22 @@
         android:text="GPA: "
         android:textSize="40sp"
         android:layout_centerHorizontal="true"/>
+
+
+    <TextView
+        android:id="@+id/GPAview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="88dp"
+        android:textSize="40sp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerviewClasses"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/GPAdisplay"/>
+        android:layout_below="@id/GPAdisplay"
+        android:scrollbars="vertical" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/classFab"

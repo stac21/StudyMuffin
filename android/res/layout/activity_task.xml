@@ -106,4 +106,18 @@
         android:layout_below="@id/priority_tv"
         android:layout_toEndOf="@id/completed_tv"/>
 
+    <EditText
+        android:id="@+id/points_earned_et"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Points Earned"
+        android:layout_below="@id/completed_cb"/>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_below="@id/points_earned_et"/>
+
 </RelativeLayout>

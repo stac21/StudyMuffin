@@ -38,9 +38,37 @@ public class ClassFragment extends Fragment {
     public static int selectedCardPosition;
     public static boolean isCardSelected = false;
 
-    public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
+    public static final String COURSE_FILE = "com.example.studymuffin.course_file";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
+
+    public static float GPAcalculator(ArrayList<CourseInfo> a, Context context) {
+        float totalPoints=0;
+
+        for (int i=0; i< a.size(); i++) {
+
+            if (a.get(i).calculateClassGrade(context) >= 90 ) {
+                totalPoints= totalPoints+ 4;
+            } else {
+                if (a.get(i).calculateClassGrade(context) >= 80 ) {
+                    totalPoints= totalPoints+ 3;
+                } else {
+                    if (a.get(i).calculateClassGrade(context) >= 70) {
+                        totalPoints= totalPoints+ 2;
+                    } else {
+                        if (a.get(i).calculateClassGrade(context) >= 60) {
+                            totalPoints= totalPoints+ 1;
+                        } else {
+                            totalPoints= totalPoints+ 0;
+                        }
+                    }
+                }
+            }
+
+        }
+        return totalPoints/ a.size()*3;
+
+    }
 
     @Nullable
     @Override
@@ -53,6 +81,7 @@ public class ClassFragment extends Fragment {
         }
 
         CourseInfo.idCounter = loadCourseIdCounter(context);
+        System.out.println("CourseInfo.idCounter = " + CourseInfo.idCounter);
 
         this.makeRecyclerView();
 

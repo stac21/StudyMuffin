@@ -375,9 +375,15 @@ public class MainActivity extends AppCompatActivity {
             // notify the recyclerview that the list has changed when the list is sorted
             CalendarFragment.cardAdapter.notifyItemRangeChanged(0,
                     CalendarFragment.cardAdapter.getItemCount());
-
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SettingsActivity.setThemeOfApp(this);
     }
 }
