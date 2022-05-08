@@ -22,7 +22,7 @@ public class CourseActivity extends AppCompatActivity {
     private TextView classRoom;
     private TextView classLink;
     private TextView classSchedule;
-    private TextView classColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,18 +36,51 @@ public class CourseActivity extends AppCompatActivity {
         Type collectionType = new TypeToken<CourseInfo>(){}.getType();
         CourseInfo course = new Gson().fromJson(json, collectionType);
 
+        float classGrade = course.calculateClassGrade(context);
+        String classGradeStr = (classGrade + "").equals("NaN") ? "Input tasks to see a grade" :
+                classGrade + "%";
+
+        String startTimeStr = getAmPmFormat(course.getStartTimeHour(), course.getStartTimeMinute());
+        String endTimeStr = getAmPmFormat(course.getEndTimeHour(), course.getEndTimeMinute());
+        String classSchedule = course.getDaysOfWeek().get(0) + " " + startTimeStr + "-" + endTimeStr;
+
         this.className = this.findViewById(R.id.className);
         this.gradeTV = this.findViewById(R.id.gradeTV);
         this.classInstructor = this.findViewById(R.id.classInstructor);
         this.classRoom = this.findViewById(R.id.classRoom);
         this.classLink = this.findViewById(R.id.classLink);
-        this.classColor = this.findViewById(R.id.classColor);
+        this.classSchedule = this.findViewById(R.id.classSchedule);
 
         this.className.setText(course.getTitle());
-        this.gradeTV.setText(course.calculateClassGrade(context) + "");
+        this.gradeTV.setText(classGradeStr);
         this.classInstructor.setText(course.getInstructor().getFirstName() + " " + course.getInstructor().getLastName());
         this.classRoom.setText(course.getClassroom());
         this.classLink.setText(course.getZoomLink());
-        this.classColor.setText(course.getColor() + "");
+        this.classSchedule.setText(classSchedule);
+    }
+
+    /**
+     * turns the hour and minute to AM PM time format
+     * @param hour the hour
+     * @param minute the minute
+     * @return a string representation of the time in AM PM format
+     */
+    public static String getAmPmFormat(int hour, int minute) {
+        String time = "";
+
+        int convertedHour = (hour > 12) ? hour - 12 : hour;
+
+        time += convertedHour;
+        time += ":";
+
+        if (minute < 10) {
+            time += "0" + minute;
+        } else {
+            time += minute;
+        }
+
+        time += (hour < 12) ? " AM" : " PM";
+
+        return time;
     }
 }

@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     public static SearchView calendarSearchView;
     public static Account userAccount;
     private FirebaseAuth mAuth;
-    // public static Profile profile = new Profile("Profile", "One", 0, 0);
     public static Profile profile;
     private BottomNavigationView bottomNav;
 
@@ -71,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText lastName = this.findViewById(R.id.lastName);
         final TextView incorrectUsernamePassword = this.findViewById(R.id.incorrectUsernamePassword);
 
-        // loadFragment(currentFragment);
+        loadFragment(currentFragment);
 
         mAuth = FirebaseAuth.getInstance();
         userAccount = Account.loadAccount(MainActivity.this);
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 studMuffin.setVisibility(View.INVISIBLE);
 
                 MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
-                loadFragment(calendarItem);
+                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -128,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 registerButton.setVisibility(View.INVISIBLE);
 
                 MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
-                loadFragment(calendarItem);
+                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 studMuffin.setVisibility(View.INVISIBLE);
 
                 MenuItem calendarItem = bottomNav.getMenu().findItem(R.id.nav_calendar);
-                loadFragment(calendarItem);
+                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        loadFragment(item);
+                        loadFragment(item.getItemId());
 
                         return true;
                     }
@@ -236,11 +235,16 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    public void loadFragment(MenuItem item) {
+    public void loadFragment(int itemId) {
         Fragment selectedFragment = null;
-        int itemId = item.getItemId();
         currentFragment = itemId;
-        item.setChecked(true);
+
+        try {
+            MenuItem item = bottomNav.getMenu().findItem(itemId);
+            item.setChecked(true);
+        } catch (NullPointerException e) {
+            System.out.println("Item was null. ItemId = " + itemId);
+        }
 
         if (MainActivity.isInCalendarFragment) {
             MainActivity.isInCalendarFragment = false;
@@ -292,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem filterDueDateItem = menu.findItem(R.id.sort_due_date_item);
         MenuItem switchLayoutItem = menu.findItem(R.id.switch_layout_item);
 
-        if (CalendarFragment.isCardSelected) {
+        if (CalendarFragment.isCardSelected || ClassFragment.isCardSelected) {
             deleteItem.setVisible(true);
             clearSelectionItem.setVisible(true);
             settingsItem.setVisible(false);
@@ -366,11 +370,16 @@ public class MainActivity extends AppCompatActivity {
 
             this.startActivity(i);
         } else if (id == R.id.delete_item) {
-            CalendarFragment.cardAdapter.removeCard();
+            if (currentFragment == R.id.nav_calendar) {
+                CalendarFragment.cardAdapter.removeCard();
+            } else if (currentFragment == R.id.nav_classes) {
+                ClassFragment.cardAdapter.removeCard();
+            }
 
             MainActivity.this.invalidateOptionsMenu();
         } else if (id == R.id.clear_selection_item) {
             CalendarFragment.isCardSelected = false;
+            ClassFragment.isCardSelected = false;
 
             MainActivity.this.invalidateOptionsMenu();
         } else if (id == R.id.sort_due_date_item) {

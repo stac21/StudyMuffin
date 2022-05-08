@@ -85,7 +85,7 @@ public class CourseInfo {
         System.out.println(pointsearned);
         System.out.println(pointspossible);
 
-        return pointsearned / pointspossible;
+        return (pointsearned / pointspossible) * 100;
     }
 
     public int getStartTimeHour() {
