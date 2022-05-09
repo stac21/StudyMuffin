@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -44,16 +45,16 @@ public class MainActivity extends AppCompatActivity {
     public static int currentFragment = SIGN_IN_PAGE;
     public static boolean isInCalendarFragment = false;
     public static SearchView calendarSearchView;
-    public static Account userAccount;
+    public static FirebaseUser firebaseUser;
     private FirebaseAuth mAuth;
+    public static Profile profile;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SettingsActivity.setThemeOfApp(this);
         setContentView(R.layout.activity_main);
-
-        loadFragment(currentFragment);
 
         final Button signInButton = this.findViewById(R.id.signInButton);
 
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         final Button createAccountButton = this.findViewById(R.id.createAccountButton);
         final EditText emailET = this.findViewById(R.id.emailEditText);
         final EditText passwordET = this.findViewById(R.id.passwordEditText);
-        final BottomNavigationView bottomNav = this.findViewById(R.id.bottom_nav_view);
+        this.bottomNav = this.findViewById(R.id.bottom_nav_view);
         final EditText confirmPasswordET = this.findViewById(R.id.confirmPasswordEditText);
         final ImageView studMuffin = this.findViewById(R.id.main_stud_muffin);
         final Button createProfile = this.findViewById(R.id.createProfile);
@@ -70,8 +71,10 @@ public class MainActivity extends AppCompatActivity {
         final EditText lastName = this.findViewById(R.id.lastName);
         final TextView incorrectUsernamePassword = this.findViewById(R.id.incorrectUsernamePassword);
 
+        loadFragment(currentFragment);
+
         mAuth = FirebaseAuth.getInstance();
-        userAccount = Account.loadAccount(MainActivity.this);
+        profile = Profile.loadProfile(MainActivity.this);
 
         if (currentFragment != SIGN_IN_PAGE) {
             bottomNav.setVisibility(View.VISIBLE);
@@ -87,27 +90,54 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String email = emailET.getText().toString();
+                String password = passwordET.getText().toString();
+                
+                if (email.length() != 0 && password.length() != 0) {
+                    String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
-                String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+                    Pattern pattern = Pattern.compile(regex);
 
-                Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(emailET.getText().toString());
+                    System.out.println(matcher);
+                    System.out.println("In sign in onClick");
 
-                Matcher matcher = pattern.matcher(emailET.getText().toString());
-                System.out.println(matcher);
+                    if (matcher.matches()) {
+                        mAuth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            // sign in success, update user logged in with the signed-in user's information
+                                            System.out.println("Successfully logged into account");
+                                            firebaseUser = mAuth.getCurrentUser();
 
-                if(matcher.matches() == true){
-                    bottomNav.setVisibility(View.VISIBLE);
-                }else{
-                    bottomNav.setVisibility(View.INVISIBLE);
+                                            bottomNav.setVisibility(View.VISIBLE);
+                                            signInButton.setVisibility(View.INVISIBLE);
+                                            guestButton.setVisibility(View.INVISIBLE);
+                                            emailET.setVisibility(View.INVISIBLE);
+                                            passwordET.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
+                                            registerButton.setVisibility(View.INVISIBLE);
+                                            studMuffin.setVisibility(View.INVISIBLE);
+
+                                            loadFragment(R.id.nav_calendar);
+                                        } else {
+                                            // sign in fail, notify user
+                                            System.out.println("Sign in failed");
+                                            Toast.makeText(v.getContext(), "Authentication failed.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(v.getContext(), "Enter a valid email",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "You must fill out all fields",
+                            Toast.LENGTH_SHORT).show();
                 }
-
-                signInButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                emailET.setVisibility(View.INVISIBLE);
-                passwordET.setVisibility(View.INVISIBLE);
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
-                studMuffin.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -127,52 +157,54 @@ public class MainActivity extends AppCompatActivity {
         createAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailET.getText().toString();
-                String password = passwordET.getText().toString();
+                if (emailET.getText().toString().length() != 0 && passwordET.getText().toString()
+                        .length() != 0 && confirmPasswordET.getText().toString().length() != 0) {
+                    String email = emailET.getText().toString();
+                    String password = passwordET.getText().toString();
+                    String confirmPassword = confirmPasswordET.getText().toString();
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
-                                    // save the account information locally
-                                    userAccount = new Account(email, password);
-                                    userAccount.save(MainActivity.this);
-                                } else {
-                                    Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
+                    //Email and Password Verification
+                    String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                createAccountButton.setVisibility(View.INVISIBLE);
-                guestButton.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
+                    Pattern pattern = Pattern.compile(regex);
 
+                    Matcher matcher = pattern.matcher(email);
+                    System.out.println(matcher);
 
-                //Email and Password Verification
-                String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+                    //if the email is the right format + passwords match -> the app is accessible
+                    if (matcher.matches() && password.equals(confirmPassword)) {
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                            firebaseUser = mAuth.getCurrentUser();
 
-                Pattern pattern = Pattern.compile(regex);
+                                            bottomNav.setVisibility(View.VISIBLE);
+                                            signInButton.setVisibility(View.INVISIBLE);
+                                            guestButton.setVisibility(View.INVISIBLE);
+                                            emailET.setVisibility(View.INVISIBLE);
+                                            passwordET.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
+                                            registerButton.setVisibility(View.INVISIBLE);
+                                            studMuffin.setVisibility(View.INVISIBLE);
+                                            createAccountButton.setVisibility(View.INVISIBLE);
+                                            confirmPasswordET.setVisibility(View.INVISIBLE);
 
-                Matcher matcher = pattern.matcher(emailET.getText().toString());
-                System.out.println(matcher);
-
-                //if the email is the right format + passwords match -> the app is accessible
-                if(matcher.matches() == true /*&& passwordET.equals(confirmPasswordET)*/){
-                    bottomNav.setVisibility(View.VISIBLE);
-                    signInButton.setVisibility(View.INVISIBLE);
-                    guestButton.setVisibility(View.INVISIBLE);
-                    emailET.setVisibility(View.INVISIBLE);
-                    passwordET.setVisibility(View.INVISIBLE);
-                    confirmPasswordET.setVisibility(View.INVISIBLE);
-                    registerButton.setVisibility(View.INVISIBLE);
-                    studMuffin.setVisibility(View.INVISIBLE);
-                } else{
-                    bottomNav.setVisibility(View.INVISIBLE);
-                    incorrectUsernamePassword.setVisibility(View.VISIBLE);
-                    confirmPasswordET.setVisibility(View.VISIBLE);
+                                            loadFragment(R.id.nav_calendar);
+                                        } else {
+                                            Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(v.getContext(), "Your passwords do not match",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(v.getContext(), "You must fill out all fields",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -180,15 +212,19 @@ public class MainActivity extends AppCompatActivity {
         guestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmPasswordET.setVisibility(View.INVISIBLE);
-                createAccountButton.setVisibility(View.INVISIBLE);
+                bottomNav.setVisibility(View.VISIBLE);
+                createProfile.setVisibility(View.INVISIBLE);
+                lastName.setVisibility(View.INVISIBLE);
+                firstName.setVisibility(View.INVISIBLE);
+                signInButton.setVisibility(View.INVISIBLE);
                 guestButton.setVisibility(View.INVISIBLE);
-                registerButton.setVisibility(View.INVISIBLE);
-                createProfile.setVisibility(View.VISIBLE);
-                lastName.setVisibility(View.VISIBLE);
-                firstName.setVisibility(View.VISIBLE);
                 emailET.setVisibility(View.INVISIBLE);
                 passwordET.setVisibility(View.INVISIBLE);
+                confirmPasswordET.setVisibility(View.INVISIBLE);
+                registerButton.setVisibility(View.INVISIBLE);
+                studMuffin.setVisibility(View.INVISIBLE);
+
+                loadFragment(R.id.nav_calendar);
             }
         });
 
@@ -224,6 +260,13 @@ public class MainActivity extends AppCompatActivity {
     public void loadFragment(int itemId) {
         Fragment selectedFragment = null;
         currentFragment = itemId;
+
+        try {
+            MenuItem item = bottomNav.getMenu().findItem(itemId);
+            item.setChecked(true);
+        } catch (NullPointerException e) {
+            System.out.println("Item was null. ItemId = " + itemId);
+        }
 
         if (MainActivity.isInCalendarFragment) {
             MainActivity.isInCalendarFragment = false;
@@ -275,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem filterDueDateItem = menu.findItem(R.id.sort_due_date_item);
         MenuItem switchLayoutItem = menu.findItem(R.id.switch_layout_item);
 
-        if (CalendarFragment.isCardSelected) {
+        if (CalendarFragment.isCardSelected || ClassFragment.isCardSelected) {
             deleteItem.setVisible(true);
             clearSelectionItem.setVisible(true);
             settingsItem.setVisible(false);
@@ -349,11 +392,16 @@ public class MainActivity extends AppCompatActivity {
 
             this.startActivity(i);
         } else if (id == R.id.delete_item) {
-            CalendarFragment.cardAdapter.removeCard();
+            if (currentFragment == R.id.nav_calendar) {
+                CalendarFragment.cardAdapter.removeCard();
+            } else if (currentFragment == R.id.nav_classes) {
+                ClassFragment.cardAdapter.removeCard();
+            }
 
             MainActivity.this.invalidateOptionsMenu();
         } else if (id == R.id.clear_selection_item) {
             CalendarFragment.isCardSelected = false;
+            ClassFragment.isCardSelected = false;
 
             MainActivity.this.invalidateOptionsMenu();
         } else if (id == R.id.sort_due_date_item) {
@@ -375,6 +423,12 @@ public class MainActivity extends AppCompatActivity {
             // notify the recyclerview that the list has changed when the list is sorted
             CalendarFragment.cardAdapter.notifyItemRangeChanged(0,
                     CalendarFragment.cardAdapter.getItemCount());
+        } else if (id == R.id.monthly_layout_item) {
+            CalendarFragment.monthlyCalendarView.setVisibility(View.VISIBLE);
+            CalendarFragment.todoListRecyclerView.setVisibility(View.INVISIBLE);
+        } else if (id == R.id.todo_list_item) {
+            CalendarFragment.monthlyCalendarView.setVisibility(View.INVISIBLE);
+            CalendarFragment.todoListRecyclerView.setVisibility(View.VISIBLE);
         }
 
         return super.onOptionsItemSelected(item);

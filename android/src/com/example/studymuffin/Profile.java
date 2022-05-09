@@ -13,13 +13,19 @@ import java.lang.reflect.Type;
 public class Profile {
     private String firstName;
     private String lastName;
-    private int numPoints;
+    private int numStudyPoints;
+    private float numBakeryMoney;
+    private boolean hasPurchasedPastelTheme;
+    private boolean hasPurchasedElleWoodsTheme;
     public static String PROFILE_FILE = "com.example.studymuffin.profile";
 
-    public Profile(String firstName, String lastName, int numPoints) {
+    public Profile(String firstName, String lastName, int numStudyPoints, int numBakeryMoney) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.numPoints = numPoints;
+        this.numStudyPoints = numStudyPoints;
+        this.numBakeryMoney = numBakeryMoney;
+        this.hasPurchasedPastelTheme = false;
+        this.hasPurchasedElleWoodsTheme = false;
     }
 
     public String getFirstName() {
@@ -39,15 +45,51 @@ public class Profile {
     }
 
     public int getNumPoints() {
-        return numPoints;
+        return numStudyPoints;
     }
 
-    public void addPoints(int numPoints) {
-        this.numPoints += numPoints;
+    public void addPoints(int numStudyPoints) {
+        this.numStudyPoints += numStudyPoints;
     }
 
-    public void substractPoints(int numPoints) {
-        this.numPoints -= numPoints;
+    public void substractPoints(int numStudyPoints) {
+        this.numStudyPoints -= numStudyPoints;
+    }
+
+    public void setPoints(int numStudyPoints) {
+        this.numStudyPoints = numStudyPoints;
+    }
+
+    public float getnumBakeryMoney() {
+        return numBakeryMoney;
+    }
+
+    public void addBakeryMoney(float numBakeryMoney) {
+        this.numBakeryMoney += numBakeryMoney;
+    }
+
+    public void substractBakeryMoney(float numBakeryMoney) {
+        this.numBakeryMoney -= numBakeryMoney;
+    }
+
+    public void setBakeryMoney(float numBakeryMoney) {
+        this.numBakeryMoney = numBakeryMoney;
+    }
+
+    public boolean hasPurchasedPastelTheme() {
+        return hasPurchasedPastelTheme;
+    }
+
+    public void setHasPurchasedPastelTheme(boolean hasPurchasedPastelTheme) {
+        this.hasPurchasedPastelTheme = hasPurchasedPastelTheme;
+    }
+
+    public boolean hasPurchasedElleWoodsTheme() {
+        return hasPurchasedElleWoodsTheme;
+    }
+
+    public void setHasPurchasedElleWoodsTheme(boolean hasPurchasedElleWoodsTheme) {
+        this.hasPurchasedElleWoodsTheme = hasPurchasedElleWoodsTheme;
     }
 
     /**
@@ -55,13 +97,18 @@ public class Profile {
      * @param context the application's context
      * @return the user's profile
      */
-    public Profile loadProfile(Context context) {
+    public static Profile loadProfile(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(PROFILE_FILE, null);
 
         Type collectionType = new TypeToken<Profile>(){}.getType();
+        Profile profile = new Gson().fromJson(json, collectionType);
 
-        return new Gson().fromJson(json, collectionType);
+        if (profile != null) {
+            return profile;
+        } else {
+            return new Profile("Profile", "One", 0, 0);
+        }
     }
 
     /**
@@ -82,5 +129,22 @@ public class Profile {
         editor.apply();
 
         // TODO upload the updated profile to the user's account in Firebase
+    }
+
+    /**
+     * save the profile's information both locally to a JSON file
+     * as well as to the Firebase instance associated with their account,
+     * if it exists
+     * @param context the application's context
+     */
+    public void save(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String json = new Gson().toJson(this);
+
+        editor.putString(PROFILE_FILE, json);
+
+        editor.apply();
     }
 }

@@ -27,18 +27,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CalendarFragment extends Fragment {
     private View view;
@@ -48,11 +52,16 @@ public class CalendarFragment extends Fragment {
     public static final int PHYSICAL_MEETING_COLOR = Color.GREEN;
     public static final int VIRTUAL_MEETING_COLOR = Color.YELLOW;
     public static ArrayList<CourseInfo> courseList;
-    public static CompactCalendarView calendarView;
+    public static RecyclerView todoListRecyclerView;
+    public static CompactCalendarView monthlyCalendarView;
     public static CalendarCardAdapter cardAdapter;
     public static boolean isCardSelected = false;
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
+
+    private static boolean loadFromDb = true;
+
+    public static Profile profile = MainActivity.profile;
 
     public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
     public static final String SORT_PREFERENCE_FILE = "com.example.studymuffin.sort_preference";
@@ -69,20 +78,22 @@ public class CalendarFragment extends Fragment {
         final FloatingActionButton fab = view.findViewById(R.id.calendar_fab);
         final TextView monthLabel = view.findViewById(R.id.calendar_month_label);
 
-        if (calendarView == null) {
-            calendarView = view.findViewById(R.id.compact_calendar_view);
-        }
+        monthlyCalendarView = view.findViewById(R.id.compact_calendar_view);
+
         if (sortPreference == null) {
             System.out.println("sortPreference is null");
             sortPreference = loadSortPreference(context);
             System.out.println("Finished loading sort preference");
         }
 
-        // TODO: save the tasks into the course list
+        cardAdapter = new CalendarCardAdapter(loadTaskList(context));
+/*
         if (cardAdapter == null) {
             System.out.println("CardAdapter is null");
             cardAdapter = new CalendarCardAdapter(loadTaskList(context));
         }
+        */
+
         Task.idCounter = loadTaskIdCounter(context);
 
         courseList = ClassFragment.loadCourseList(context);
@@ -105,6 +116,8 @@ public class CalendarFragment extends Fragment {
 
         monthLabel.setText(months[currentMonth]);
         populateCalendar(cardAdapter.getTaskList());
+
+        monthlyCalendarView.shouldScrollMonth(false);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +183,13 @@ public class CalendarFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        cardAdapter.setTaskList(loadTaskList(view.getContext()));
+    }
+
     /**
      * populates the calendar with all of the month's tasks
      * TODO make this efficient so that it only checks the current month's tasks
@@ -198,7 +218,7 @@ public class CalendarFragment extends Fragment {
             color = VIRTUAL_MEETING_COLOR;
         }
 
-        calendarView.addEvent(new Event(color,
+        monthlyCalendarView.addEvent(new Event(color,
                 task.getDate().getTime(), task.getName()));
     }
 
@@ -267,12 +287,12 @@ public class CalendarFragment extends Fragment {
     }
 
     public void makeRecyclerView() {
-        RecyclerView recyclerView = this.view.findViewById(R.id.recyclerViewCalendar);
-        recyclerView.setHasFixedSize(true);
+        todoListRecyclerView = this.view.findViewById(R.id.todo_list);
+        todoListRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager llm = new LinearLayoutManager(this.getContext());
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(cardAdapter);
+        todoListRecyclerView.setLayoutManager(llm);
+        todoListRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        todoListRecyclerView.setAdapter(cardAdapter);
     }
 
     public class CardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,
@@ -319,7 +339,12 @@ public class CalendarFragment extends Fragment {
             isCardSelected = true;
             selectedCardPosition = this.getAdapterPosition();
 
-            CalendarFragment.this.getActivity().invalidateOptionsMenu();
+            try {
+                getActivity().invalidateOptionsMenu();
+            } catch (NullPointerException e) {
+                Toast.makeText(v.getContext(), "Try reloading the application",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             return true;
         }
@@ -478,6 +503,11 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    /**
+     * load the user's preference of how the todo list should be sorted
+     * @param context the application's context
+     * @return the user's sort preference
+     */
     public static SortPreference loadSortPreference(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(SORT_PREFERENCE_FILE, null);
@@ -492,6 +522,10 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    /**
+     * save the user's preference of how the todo list should be sorted
+     * @param context the application's context
+     */
     public static void saveSortPreference(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
@@ -503,24 +537,64 @@ public class CalendarFragment extends Fragment {
         editor.apply();
     }
 
+    /**
+     * loads the task list
+     * @param context the application's context
+     * @return the loaded task list
+     */
     public static ArrayList<Task> loadTaskList(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(TASK_FILE, null);
-
-        /*
-        Type collectionType = new TypeToken<ArrayList<Task>>(){}.getType();
-        ArrayList<Task> taskList = new Gson().fromJson(json, collectionType);
-         */
-
-        if (MainActivity.userAccount != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-        }
-
         ArrayList<Task> taskList = new ArrayList<>();
 
-        // if the save file exists, load the data
-        if (json != null) {
-            Gson gson = new Gson();
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null &&
+                loadFromDb) {
+            final ArrayList<Task> loadedTaskList = new ArrayList<>();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.firebaseUser.getEmail());
+
+            DocumentReference dataRef = ref.document(TASK_FILE);
+            dataRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+
+                        if (document.exists()) {
+                            Map<String, Object> data = document.getData();
+
+                            if (data.get(TASK_ID_COUNTER_FILE) != null) {
+                                Task.idCounter = Math.toIntExact((long)data.get(TASK_ID_COUNTER_FILE));
+                            }
+
+                            String dataJson = (String) data.get(TASK_FILE);
+                            JsonArray jsonArray = new JsonParser().parse(dataJson).getAsJsonArray();
+                            String currentElementJson;
+
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                currentElementJson = jsonArray.get(i).toString();
+
+                                System.out.println(currentElementJson);
+
+                                loadedTaskList.add(convertJsonToTask(currentElementJson));
+                            }
+
+                            loadFromDb = false;
+                            saveTaskList(context, loadedTaskList);
+                            CalendarFragment.cardAdapter.setTaskList(loadTaskList(context));
+
+                            System.out.println("TaskList exists " + data);
+                        } else {
+                            System.out.println("No such document");
+                        }
+                    } else {
+                        System.out.println("TaskList could not be retrieved" + task.getException());
+                    }
+                }
+            });
+        } else {
+            loadFromDb = true;
             JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
             String currentElementJson;
 
@@ -530,26 +604,58 @@ public class CalendarFragment extends Fragment {
 
                 System.out.println(currentElementJson);
 
-                if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSIGNMENT.toString()
-                        + "\"")) {
-                    Assignment a = gson.fromJson(currentElementJson, Assignment.class);
-                    taskList.add(a);
-                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.ASSESSMENT
-                        .toString() + "\"")) {
-                    Assessment a = gson.fromJson(currentElementJson, Assessment.class);
-                    taskList.add(a);
-                } else if (currentElementJson.contains("\"taskType\":\"" + TaskType.VIRTUAL_MEETING
-                        .toString() + "\"")) {
-                    VirtualMeeting vm = gson.fromJson(currentElementJson, VirtualMeeting.class);
-                    taskList.add(vm);
-                } else {
-                    PhysicalMeeting pm = gson.fromJson(currentElementJson, PhysicalMeeting.class);
-                    taskList.add(pm);
-                }
+                taskList.add(convertJsonToTask(currentElementJson));
             }
         }
 
         return taskList;
+    }
+
+    public static void loadTaskListFromDb(Context context) {
+
+    }
+
+    /**
+     * converts the json format of a task to its proper POJO
+     * @param json the json format of a task
+     * @return a task in its proper subclass of Task
+     */
+    public static Task convertJsonToTask(String json) {
+        Gson gson = new Gson();
+
+        if (json.contains("\"taskType\":\"" + TaskType.ASSIGNMENT.toString()
+                + "\"")) {
+            return gson.fromJson(json, Assignment.class);
+        } else if (json.contains("\"taskType\":\"" + TaskType.ASSESSMENT
+                .toString() + "\"")) {
+            return gson.fromJson(json, Assessment.class);
+        } else if (json.contains("\"taskType\":\"" + TaskType.VIRTUAL_MEETING
+                .toString() + "\"")) {
+            return gson.fromJson(json, VirtualMeeting.class);
+        } else {
+            return gson.fromJson(json, PhysicalMeeting.class);
+        }
+    }
+
+    /**
+     * save an individual task to the tasklist
+     * @param context the application's context
+     * @param task the task to save
+     */
+    public static void saveTask(Context context, Task task) {
+        ArrayList<Task> taskList = loadTaskList(context);
+        Task currentTask;
+
+        for (int i = 0; i < taskList.size(); i++) {
+            currentTask = taskList.get(i);
+
+            if (currentTask.getUniqueId() == task.getUniqueId()) {
+                taskList.set(i, task);
+                break;
+            }
+        }
+
+        saveTaskList(context, taskList);
     }
 
     /**
@@ -560,7 +666,6 @@ public class CalendarFragment extends Fragment {
     public static void saveTaskList(Context context, ArrayList<Task> taskList) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // save the data locally
         String json = new Gson().toJson(taskList);
@@ -568,16 +673,20 @@ public class CalendarFragment extends Fragment {
         editor.putString(TASK_FILE, json);
         editor.putInt(TASK_ID_COUNTER_FILE, Task.idCounter);
 
-        // save the data to firebase
-        if (MainActivity.userAccount != null) {
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
-            ref.document(TASK_FILE).set(json);
-            ref.document(TASK_ID_COUNTER_FILE).set(Task.idCounter);
-        }
-
-
         editor.apply();
+
+        // save the data to firebase
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference ref = db.collection("Data").document("TaskData")
+                    .collection(MainActivity.firebaseUser.getEmail());
+            Map<String, Object> data = new HashMap<>();
+
+            data.put(TASK_FILE, json);
+            data.put(TASK_ID_COUNTER_FILE, Task.idCounter);
+
+            ref.document(TASK_FILE).set(data);
+        }
     }
 
     /**
@@ -588,13 +697,13 @@ public class CalendarFragment extends Fragment {
     public static int loadTaskIdCounter(Context context) {
         int counter = 0;
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null) {
             System.out.println("The user account is not null");
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
+                    .collection(MainActivity.firebaseUser.getEmail());
             // ref.document(TASK_FILE).get();
         } else {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

@@ -27,10 +27,21 @@
         android:padding="10dp"/>
 
     <TextView
-        android:id="@+id/date_label_tv"
+        android:id="@+id/task_type_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/description_et"
+        android:text="@string/task_type"
+        android:textSize="30sp"
+        android:focusable="false"
+        android:background="@null"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/date_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/task_type_tv"
         android:text="@string/due_date"
         android:textSize="30sp"
         android:padding="10dp"/>
@@ -38,7 +49,7 @@
         android:id="@+id/date_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/description_et"
+        android:layout_below="@id/task_type_tv"
         android:layout_toEndOf="@id/date_label_tv"
         android:textSize="30sp"
         android:padding="10dp"/>
@@ -96,7 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/priority_tv"
-        android:text="Completed: "
+        android:text="@string/completed"
         android:textSize="30sp"
         android:padding="10dp"/>
     <CheckBox
@@ -106,18 +117,24 @@
         android:layout_below="@id/priority_tv"
         android:layout_toEndOf="@id/completed_tv"/>
 
-    <EditText
-        android:id="@+id/points_earned_et"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_goal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Points Earned"
-        android:layout_below="@id/completed_cb"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_add_white_24dp" />
 
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_below="@id/points_earned_et"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewGoals"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/completed_tv"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </RelativeLayout>

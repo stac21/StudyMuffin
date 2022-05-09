@@ -1,17 +1,23 @@
 package com.example.studymuffin;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,14 +30,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClassFragment extends Fragment {
     private View view;
@@ -39,7 +52,14 @@ public class ClassFragment extends Fragment {
     public static int selectedCardPosition;
     public static boolean isCardSelected = false;
     private TextView GPAview;
-    public static final String COURSE_FILE = "com.example.studymuffin.course_file";
+    private static int selectedStartHour;
+    private static int selectedStartMinute;
+    private static int selectedEndHour;
+    private static int selectedEndMinute;
+
+    private static boolean loadFromDb = true;
+
+    public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
 
@@ -74,9 +94,11 @@ public class ClassFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.view = inflater.inflate(R.layout.fragment_class_list, container, false);
         Context context = this.view.getContext();
+        Resources r = context.getResources();
 
         cardAdapter = new CardAdapter(loadCourseList(context));
 
+        final String[] times = r.getStringArray(R.array.time_spinner_array);
         CourseInfo.idCounter = loadCourseIdCounter(context);
         System.out.println("CourseInfo.idCounter = " + CourseInfo.idCounter);
 
@@ -98,19 +120,87 @@ public class ClassFragment extends Fragment {
                 final EditText linkEt = v.findViewById(R.id.link_et);
                 final EditText locationEt = v.findViewById(R.id.location_et);
                 final EditText instructorEt = v.findViewById(R.id.instructor_et);
-                final EditText dayTimeEt = v.findViewById(R.id.day_time_et);
+                final EditText dayEt = v.findViewById(R.id.day_et);
+                final Spinner startTimeSpinner = v.findViewById(R.id.startTimeSpinner);
+                final Spinner endTimeSpinner = v.findViewById(R.id.endTimeSpinner);
+
+                startTimeSpinner.setAdapter(new ArrayAdapter<String>(context,
+                        android.R.layout.simple_spinner_dropdown_item, times));
+                startTimeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                        if (position == 4) {
+                            Calendar currentTime = Calendar.getInstance();
+                            int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                            int minute = currentTime.get(Calendar.MINUTE);
+
+                            final TimePickerDialog tmDialog = new TimePickerDialog(
+                                    view.getContext(), new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int userMinute) {
+                                    selectedStartHour = hourOfDay;
+                                    selectedStartMinute = userMinute;
+                                }
+                            }, hour, minute, true);
+
+                            tmDialog.setTitle("Select Time");
+                            tmDialog.show();
+                        } else {
+                            selectedStartHour = Integer.parseInt(times[position].substring(0, 2));
+                            selectedStartMinute = 0;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+
+                endTimeSpinner.setAdapter(new ArrayAdapter<String>(context,
+                        android.R.layout.simple_spinner_dropdown_item, times));
+                endTimeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                        if (position == 4) {
+                            Calendar currentTime = Calendar.getInstance();
+                            int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                            int minute = currentTime.get(Calendar.MINUTE);
+
+                            final TimePickerDialog tmDialog = new TimePickerDialog(
+                                    view.getContext(), new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker view, int hourOfDay, int userMinute) {
+                                    selectedEndHour = hourOfDay;
+                                    selectedEndMinute = userMinute;
+                                }
+                            }, hour, minute, true);
+
+                            tmDialog.setTitle("Select Time");
+                            tmDialog.show();
+                        } else {
+                            selectedEndHour = Integer.parseInt(times[position].substring(0, 2));
+                            selectedEndMinute = 0;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
 
                 dialog.setTitle("Create Class");
                 dialog.setView(v);
                 // may have to set this to false
                 dialog.setCancelable(true);
-                dialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                dialog.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                     }
                 });
-                dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                dialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
@@ -130,23 +220,30 @@ public class ClassFragment extends Fragment {
                                 String name = nameEt.getText().toString();
                                 String location = locationEt.getText().toString();
                                 String instructor = instructorEt.getText().toString();
-                                String dayTime = dayTimeEt.getText().toString();
+                                String date = dayEt.getText().toString();
                                 String link = linkEt.getText().toString();
+                                ArrayList<String> daysOfWeek = new ArrayList<>();
+                                daysOfWeek.add(date);
 
                                 if (name.length() != 0 && location.length() != 0 &&
-                                        instructor.length() != 0 && dayTime.length() != 0 &&
-                                        link.length() != 0) {
+                                        instructor.length() != 0 && date.length() != 0 &&
+                                        link.length() != 0 && (selectedStartHour < selectedEndHour
+                                        || (selectedStartHour == selectedEndHour &&
+                                        selectedStartMinute < selectedEndMinute))) {
                                     // TODO make a spinner or something for instructors
-                                    String firstName = instructor.substring(0,
-                                            instructor.indexOf(" "));
-                                    String lastName = instructor.substring(
-                                            instructor.indexOf(" ") + 1);
+                                    String firstName = instructor;
+                                    String lastName = "";
 
                                     cardAdapter.addCard(name, new Instructor(firstName, lastName),
-                                            location, link, new ArrayList<String>(), 0,
-                                            0, 0, 0, Color.RED);
+                                            location, link, daysOfWeek,
+                                            selectedStartHour,
+                                            selectedStartMinute, selectedEndHour, selectedEndMinute,
+                                            Color.RED);
 
                                     alertDialog.dismiss();
+                                } else {
+                                    Toast.makeText(context, "All fields must be filled out and" +
+                                            " start must be less than end time", Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
@@ -169,7 +266,7 @@ public class ClassFragment extends Fragment {
         recyclerView.setAdapter(this.cardAdapter);
     }
 
-    private class CardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,
+    public class CardViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,
             View.OnClickListener {
         protected TextView titleTextView, dateTextView;
 
@@ -201,13 +298,18 @@ public class ClassFragment extends Fragment {
             isCardSelected = true;
             selectedCardPosition = this.getAdapterPosition();
 
-            ClassFragment.this.getActivity().invalidateOptionsMenu();
+            try {
+                getActivity().invalidateOptionsMenu();
+            } catch (NullPointerException e) {
+                Toast.makeText(v.getContext(), "Try reloading the application",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             return true;
         }
     }
 
-    private class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
+    public class CardAdapter extends RecyclerView.Adapter<CardViewHolder> {
         private ArrayList<CourseInfo> courseInfoList;
 
         public CardAdapter(ArrayList<CourseInfo> courseInfoList) {
@@ -270,38 +372,106 @@ public class ClassFragment extends Fragment {
 
     public static ArrayList<CourseInfo> loadCourseList(Context context) {
         Type collectionType = new TypeToken<ArrayList<CourseInfo>>(){}.getType();
-        ArrayList<CourseInfo> courseList = new ArrayList<>();
+        final ArrayList<CourseInfo> courseList = new ArrayList<>();
 
-        if (MainActivity.userAccount != null) {
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null &&
+                loadFromDb) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.userAccount.getEmail());
+            CollectionReference ref = db.collection("Data")
+                    .document("CourseData")
+                    .collection(MainActivity.firebaseUser.getEmail());
 
+            DocumentReference dataRef = ref.document(COURSE_FILE);
+            dataRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+
+                        if (document.exists()) {
+                            Map<String, Object> data = document.getData();
+
+                            if (data.get(COURSE_ID_COUNTER_FILE) != null) {
+                                CourseInfo.idCounter = Math.toIntExact((long)data.get(COURSE_ID_COUNTER_FILE));
+                            }
+
+                            String dataJson = (String) data.get(COURSE_FILE);
+                            System.out.println("Course Json: " + dataJson);
+                            ArrayList<CourseInfo> loadedCourseList = new Gson().fromJson(dataJson,
+                                    collectionType);
+
+                            System.out.println("loadedCourseList: ");
+
+                            for (CourseInfo ci : loadedCourseList) {
+                                System.out.println(ci.getTitle());
+                            }
+
+                            if (loadedCourseList != null) {
+                                courseList.addAll(loadedCourseList);
+
+                                System.out.println("CourseList: ");
+
+                                for (CourseInfo ci : courseList) {
+                                    System.out.println(ci.getTitle());
+                                }
+                            }
+
+                            loadFromDb = false;
+
+                            System.out.println("CourseList exists");
+                        } else {
+                            System.out.println("No such document");
+                        }
+                    } else {
+                        System.out.println("CourseList could not be retrieved" + task.getException());
+                    }
+                }
+            });
         } else {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
             String json = sp.getString(COURSE_FILE, null);
+            ArrayList<CourseInfo> loadedCourseList = new Gson().fromJson(json, collectionType);
 
-            courseList = new Gson().fromJson(json, collectionType);
+            if (loadedCourseList != null) {
+                courseList.addAll(new Gson().fromJson(json, collectionType));
+            }
         }
 
-        if (courseList != null) {
-            return courseList;
-        } else {
-            return new ArrayList<>();
+        System.out.println("CourseList after condition");
+        for (CourseInfo ci : courseList) {
+            System.out.println(ci.getTitle());
         }
+
+        return courseList;
     }
 
     public static void saveCourseList(Context context, ArrayList<CourseInfo> courseList) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
 
+        // save the data locally
         String json = new Gson().toJson(courseList);
 
         editor.putString(COURSE_FILE, json);
         editor.putInt(COURSE_ID_COUNTER_FILE, CourseInfo.idCounter);
 
         editor.apply();
+
+        // save the data to firebase
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            CollectionReference ref = db.collection("Data")
+                    .document("CourseData")
+                    .collection(MainActivity.firebaseUser.getEmail());
+
+            Map<String, Object> data = new HashMap<>();
+
+            data.put(COURSE_FILE, json);
+            data.put(COURSE_ID_COUNTER_FILE, CourseInfo.idCounter);
+
+            ref.document(COURSE_FILE).set(data);
+        }
     }
 
     public static CourseInfo getCourseAtIndex(Context context, int courseIndex) {

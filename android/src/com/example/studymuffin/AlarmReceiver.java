@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 public class AlarmReceiver extends BroadcastReceiver {
     public AlarmReceiver() {}
@@ -32,6 +33,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 Type collectionType;
                 int taskType = intent.getIntExtra(MyNotification.TASK_TYPE,
                         MyNotification.ASSIGNMENT);
+                // check to see whether the task has been deleted
+                boolean isInTaskList = false;
 
                 try {
                     if (taskType == MyNotification.ASSIGNMENT) {
@@ -47,11 +50,19 @@ public class AlarmReceiver extends BroadcastReceiver {
                             intent.getStringExtra(MyNotification.ALARM_TASK),
                             collectionType
                     );
+
+                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
+                    for (Task t : taskList) {
+                        if (task.getUniqueId() == t.getUniqueId()) {
+                            isInTaskList = true;
+                            break;
+                        }
+                    }
                 } catch (RuntimeException e) {
                     System.out.println("For some reason the task cannot be created");
                 }
 
-                if (task != null && task.shouldNotify()) {
+                if (task != null && task.shouldNotify() && isInTaskList) {
                     new MyNotification(context, task);
                 } else if (!task.shouldNotify()) {
                     System.out.println("The user opted not to be notified of that task");
