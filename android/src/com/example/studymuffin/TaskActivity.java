@@ -108,7 +108,7 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
         this.completedCb.setChecked(task.isCompleted());
-        
+
         addGoal = this.findViewById(R.id.add_goal);
 
         this.notifyCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

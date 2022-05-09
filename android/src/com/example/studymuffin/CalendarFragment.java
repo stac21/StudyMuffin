@@ -594,17 +594,19 @@ public class CalendarFragment extends Fragment {
                 }
             });
         } else {
-            loadFromDb = true;
-            JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
-            String currentElementJson;
+            if (json != null) {
+                loadFromDb = true;
+                JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
+                String currentElementJson;
 
-            System.out.println("JSONArray size = " + jsonArray.size());
-            for (int i = 0; i < jsonArray.size(); i++) {
-                currentElementJson = jsonArray.get(i).toString();
+                System.out.println("JSONArray size = " + jsonArray.size());
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    currentElementJson = jsonArray.get(i).toString();
 
-                System.out.println(currentElementJson);
+                    System.out.println(currentElementJson);
 
-                taskList.add(convertJsonToTask(currentElementJson));
+                    taskList.add(convertJsonToTask(currentElementJson));
+                }
             }
         }
 
