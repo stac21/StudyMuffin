@@ -50,7 +50,7 @@ public class MyNotification {
         taskIntent.putExtra(TASK_INTENT, json);
         taskIntent.setAction(CLICKED_ACTION);
         PendingIntent taskPi = PendingIntent.getBroadcast(context, TASK_REQUEST_CODE, taskIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         this.builder = new NotificationCompat.Builder(context,
                 CHANNEL_ID);

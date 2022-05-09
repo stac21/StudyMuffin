@@ -62,14 +62,17 @@ public class CourseInfo {
         for (int i = 0; i < taskList.size(); i++) {
             Task task = taskList.get(i);
 
+            System.out.println("Task id: " + task.getCourseId());
+            System.out.println("Course id: " + this.uniqueId);
+
             // if the task belongs to this course, use it to calculate the grade
             if (task.getCourseId() == this.uniqueId) {
                 if (task instanceof Assessment) {
                     System.out.println("Instance of Assessment");
 
                     Assessment a = (Assessment) taskList.get(i);
-                    pointspossible= pointspossible+ a.getPointsPossible();
-                    pointsearned= pointsearned+ a.getPointsEarned();
+                    pointspossible= pointspossible + a.getPointsPossible();
+                    pointsearned= pointsearned + a.getPointsEarned();
                 } else if (task instanceof Assignment) {
                     System.out.println("Instance of Assignment");
 
@@ -84,6 +87,7 @@ public class CourseInfo {
 
         System.out.println(pointsearned);
         System.out.println(pointspossible);
+
 
         return (pointsearned / pointspossible) * 100;
     }

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -50,6 +51,7 @@ public class ClassFragment extends Fragment {
     public static CardAdapter cardAdapter;
     public static int selectedCardPosition;
     public static boolean isCardSelected = false;
+    private TextView GPAview;
     private static int selectedStartHour;
     private static int selectedStartMinute;
     private static int selectedEndHour;
@@ -60,6 +62,32 @@ public class ClassFragment extends Fragment {
     public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
+
+    public static float GPAcalculator(ArrayList<CourseInfo> a, Context context) {
+        float totalPoints=0;
+
+        for (int i=0; i< a.size(); i++) {
+
+            if (a.get(i).calculateClassGrade(context) >= 90 ) {
+                totalPoints= totalPoints+ 4;
+            } else {
+                if (a.get(i).calculateClassGrade(context) >= 80 ) {
+                    totalPoints= totalPoints+ 3;
+                } else {
+                    if (a.get(i).calculateClassGrade(context) >= 70) {
+                        totalPoints= totalPoints+ 2;
+                    } else {
+                        if (a.get(i).calculateClassGrade(context) >= 60) {
+                            totalPoints= totalPoints+ 1;
+                        } else {
+                            totalPoints= totalPoints+ 0;
+                        }
+                    }
+                }
+            }
+        }
+        return totalPoints / a.size()*3;
+    }
 
     @Nullable
     @Override
@@ -72,10 +100,14 @@ public class ClassFragment extends Fragment {
 
         final String[] times = r.getStringArray(R.array.time_spinner_array);
         CourseInfo.idCounter = loadCourseIdCounter(context);
+        System.out.println("CourseInfo.idCounter = " + CourseInfo.idCounter);
 
         this.makeRecyclerView();
 
         FloatingActionButton fab = this.view.findViewById(R.id.classFab);
+
+        this.GPAview = view.findViewById(R.id.GPAview);
+        this.GPAview.setText(this.GPAcalculator(cardAdapter.getCourseInfoList(), context)+"");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

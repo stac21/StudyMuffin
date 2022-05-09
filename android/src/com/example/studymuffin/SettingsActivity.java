@@ -31,6 +31,7 @@ public class SettingsActivity extends AppCompatActivity implements
                     .commit();
         }
         ActionBar actionBar = getSupportActionBar();
+
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
