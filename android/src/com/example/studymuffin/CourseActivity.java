@@ -35,7 +35,6 @@ public class CourseActivity extends AppCompatActivity {
         String json = i.getStringExtra(ClassFragment.COURSE_INTENT);
         Type collectionType = new TypeToken<CourseInfo>(){}.getType();
         CourseInfo course = new Gson().fromJson(json, collectionType);
-        ClassFragment classFragment = new Gson().fromJson(json, collectionType);
 
         this.className = this.findViewById(R.id.className);
         this.gradeTV = this.findViewById(R.id.gradeTV);
@@ -44,16 +43,11 @@ public class CourseActivity extends AppCompatActivity {
         this.classLink = this.findViewById(R.id.classLink);
         this.classColor = this.findViewById(R.id.classColor);
 
-
         this.className.setText(course.getTitle());
         this.gradeTV.setText(course.calculateClassGrade(context) + "%");
         this.classInstructor.setText(course.getInstructor().getFirstName() + " " + course.getInstructor().getLastName());
         this.classRoom.setText(course.getClassroom());
         this.classLink.setText(course.getZoomLink());
         this.classColor.setText(course.getColor() + "");
-
     }
-
-
-
 }
