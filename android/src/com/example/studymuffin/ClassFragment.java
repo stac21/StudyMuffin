@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,7 +38,7 @@ public class ClassFragment extends Fragment {
     public static CardAdapter cardAdapter;
     public static int selectedCardPosition;
     public static boolean isCardSelected = false;
-
+    private TextView GPAview;
     public static final String COURSE_FILE = "com.example.studymuffin.course_file";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
@@ -70,6 +71,9 @@ public class ClassFragment extends Fragment {
 
     }
 
+
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,6 +90,17 @@ public class ClassFragment extends Fragment {
         this.makeRecyclerView();
 
         FloatingActionButton fab = this.view.findViewById(R.id.classFab);
+        
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_class_list);
+        Context context = ClassFragment.this;
+        Intent i = this.getIntent();
+        String json = i.getStringExtra(ClassFragment.COURSE_INTENT);
+        Type collectionType = new TypeToken<CourseInfo>(){}.getType();
+        CourseInfo course = new Gson().fromJson(json, collectionType);
+        ClassFragment classFragment = new Gson().fromJson(json, collectionType);
+        this.GPAview = this.findViewById(R.id.GPAview);
+        this.GPAview.setText(classFragment.GPAcalculator(context)+"");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

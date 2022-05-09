@@ -23,7 +23,7 @@ public class CourseActivity extends AppCompatActivity {
     private TextView classLink;
     private TextView classSchedule;
     private TextView classColor;
-    private TextView GPAview;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +43,7 @@ public class CourseActivity extends AppCompatActivity {
         this.classRoom = this.findViewById(R.id.classRoom);
         this.classLink = this.findViewById(R.id.classLink);
         this.classColor = this.findViewById(R.id.classColor);
-        this.GPAview = this.findViewById(R.id.GPAview);
+
 
         this.className.setText(course.getTitle());
         this.gradeTV.setText(course.calculateClassGrade(context) + "%");
@@ -51,7 +51,6 @@ public class CourseActivity extends AppCompatActivity {
         this.classRoom.setText(course.getClassroom());
         this.classLink.setText(course.getZoomLink());
         this.classColor.setText(course.getColor() + "");
-        this.GPAview.setText(classFragment.GPAcalculator(context)+"");
 
     }
 
