@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,7 @@ public class CalendarFragment extends Fragment {
     public static boolean isCardSelected = false;
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
+    public static final int NUM_POINTS = 1000;
 
     private static boolean loadFromDb = true;
 
@@ -87,12 +89,6 @@ public class CalendarFragment extends Fragment {
         }
 
         cardAdapter = new CalendarCardAdapter(loadTaskList(context));
-/*
-        if (cardAdapter == null) {
-            System.out.println("CardAdapter is null");
-            cardAdapter = new CalendarCardAdapter(loadTaskList(context));
-        }
-        */
 
         Task.idCounter = loadTaskIdCounter(context);
 
@@ -303,21 +299,6 @@ public class CalendarFragment extends Fragment {
             super(v);
 
             this.checkBox = (CheckBox) v.findViewById(R.id.todoCheckBox);
-            this.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        selectedCardPosition = getAdapterPosition();
-
-                        Task task = CalendarFragment.cardAdapter.getTask(selectedCardPosition);
-                        task.setCompleted(true);
-
-                        System.out.println("Card at " + selectedCardPosition + " clicked");
-
-                        //CalendarFragment.cardAdapter.removeCard();
-                    }
-                }
-            });
 
             v.setOnLongClickListener(this);
             v.setOnClickListener(this);
@@ -387,6 +368,8 @@ public class CalendarFragment extends Fragment {
             Task task = this.taskList.get(i);
 
             v.checkBox.setText(task.getName());
+            v.checkBox.setChecked(task.isCompleted());
+            v.checkBox.setClickable(false);
         }
 
         public CardViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

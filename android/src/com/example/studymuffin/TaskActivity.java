@@ -120,11 +120,13 @@ public class TaskActivity extends AppCompatActivity {
             }
         });
 
-        if (task instanceof Assignment || task instanceof Assessment) {
-            completedCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
+        completedCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    System.out.println("IsChecked: " + task.getTaskType().toString());
+                    if (task instanceof Assignment || task instanceof Assessment) {
+                        System.out.println("In the condition");
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         View v = getLayoutInflater().inflate(R.layout.checked_dialog, null);
 
@@ -168,6 +170,7 @@ public class TaskActivity extends AppCompatActivity {
                                                 if (points <= a.getPointsPossible()) {
                                                     a.setPointsEarned(points);
 
+                                                    task.setCompleted(true);
                                                     CalendarFragment.saveTask(context, a);
 
                                                     dialog.dismiss();
@@ -185,6 +188,7 @@ public class TaskActivity extends AppCompatActivity {
                                                 if (points <= a.getPointsPossible()) {
                                                     a.setPointsEarned(points);
 
+                                                    task.setCompleted(true);
                                                     CalendarFragment.saveTask(context, a);
 
                                                     dialog.dismiss();
@@ -207,10 +211,20 @@ public class TaskActivity extends AppCompatActivity {
                         });
 
                         dialog.show();
+                    } else {
+                        task.setCompleted(true);
+                        CalendarFragment.saveTask(context, task);
+                        MainActivity.profile.addPoints(NUM_POINTS);
+                        MainActivity.profile.save(context);
                     }
+                } else {
+                    task.setCompleted(false);
+                    CalendarFragment.saveTask(context, task);
+                    MainActivity.profile.substractPoints(NUM_POINTS);
+                    MainActivity.profile.save(context);
                 }
-            });
-        }
+            }
+        });
 
         // set up the priority spinner
         final String[] priorities = r.getStringArray(R.array.priority_array);
