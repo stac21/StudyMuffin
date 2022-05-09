@@ -55,6 +55,8 @@ public class ClassFragment extends Fragment {
     private static int selectedEndHour;
     private static int selectedEndMinute;
 
+    private static boolean loadFromDb = true;
+
     public static final String COURSE_FILE = "com.example.studymuffin.courseFile";
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
@@ -340,7 +342,8 @@ public class ClassFragment extends Fragment {
         Type collectionType = new TypeToken<ArrayList<CourseInfo>>(){}.getType();
         final ArrayList<CourseInfo> courseList = new ArrayList<>();
 
-        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null &&
+                loadFromDb) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             CollectionReference ref = db.collection("Data")
@@ -381,6 +384,8 @@ public class ClassFragment extends Fragment {
                                     System.out.println(ci.getTitle());
                                 }
                             }
+
+                            loadFromDb = false;
 
                             System.out.println("CourseList exists");
                         } else {

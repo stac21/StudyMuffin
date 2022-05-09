@@ -59,6 +59,8 @@ public class CalendarFragment extends Fragment {
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
 
+    private static boolean loadFromDb = true;
+
     public static Profile profile = MainActivity.profile;
 
     public static final String TASK_FILE = "com.example.studymuffin.tasks_file";
@@ -543,9 +545,11 @@ public class CalendarFragment extends Fragment {
     public static ArrayList<Task> loadTaskList(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         String json = sp.getString(TASK_FILE, null);
-        final ArrayList<Task> taskList = new ArrayList<>();
+        ArrayList<Task> taskList = new ArrayList<>();
 
-        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+        if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null &&
+                loadFromDb) {
+            final ArrayList<Task> loadedTaskList = new ArrayList<>();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference ref = db.collection("Data").document("TaskData")
                     .collection(MainActivity.firebaseUser.getEmail());
@@ -573,8 +577,12 @@ public class CalendarFragment extends Fragment {
 
                                 System.out.println(currentElementJson);
 
-                                taskList.add(convertJsonToTask(currentElementJson));
+                                loadedTaskList.add(convertJsonToTask(currentElementJson));
                             }
+
+                            loadFromDb = false;
+                            saveTaskList(context, loadedTaskList);
+                            CalendarFragment.cardAdapter.setTaskList(loadTaskList(context));
 
                             System.out.println("TaskList exists " + data);
                         } else {
@@ -586,6 +594,7 @@ public class CalendarFragment extends Fragment {
                 }
             });
         } else {
+            loadFromDb = true;
             JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
             String currentElementJson;
 
@@ -600,6 +609,10 @@ public class CalendarFragment extends Fragment {
         }
 
         return taskList;
+    }
+
+    public static void loadTaskListFromDb(Context context) {
+
     }
 
     /**
