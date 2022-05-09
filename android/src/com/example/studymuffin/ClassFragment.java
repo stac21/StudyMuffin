@@ -65,14 +65,9 @@ public class ClassFragment extends Fragment {
                     }
                 }
             }
-
         }
-        return totalPoints/ a.size()*3;
-
+        return totalPoints / a.size()*3;
     }
-
-
-
 
     @Nullable
     @Override
@@ -80,9 +75,7 @@ public class ClassFragment extends Fragment {
         this.view = inflater.inflate(R.layout.fragment_class_list, container, false);
         Context context = this.view.getContext();
 
-        if (cardAdapter == null) {
-            cardAdapter = new CardAdapter(loadCourseList(context));
-        }
+        cardAdapter = new CardAdapter(loadCourseList(context));
 
         CourseInfo.idCounter = loadCourseIdCounter(context);
         System.out.println("CourseInfo.idCounter = " + CourseInfo.idCounter);
@@ -90,17 +83,9 @@ public class ClassFragment extends Fragment {
         this.makeRecyclerView();
 
         FloatingActionButton fab = this.view.findViewById(R.id.classFab);
-        
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_class_list);
-        Context context = ClassFragment.this;
-        Intent i = this.getIntent();
-        String json = i.getStringExtra(ClassFragment.COURSE_INTENT);
-        Type collectionType = new TypeToken<CourseInfo>(){}.getType();
-        CourseInfo course = new Gson().fromJson(json, collectionType);
-        ClassFragment classFragment = new Gson().fromJson(json, collectionType);
-        this.GPAview = this.findViewById(R.id.GPAview);
-        this.GPAview.setText(classFragment.GPAcalculator(context)+"");
+
+        this.GPAview = view.findViewById(R.id.GPAview);
+        this.GPAview.setText(this.GPAcalculator(cardAdapter.getCourseInfoList(), context)+"");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
