@@ -73,8 +73,6 @@ public class TaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         Resources r = this.getResources();
-        Context context = TaskActivity.this;
-
         final Context context = TaskActivity.this;
 
         // get the task information from the CalendarFragment's intent
@@ -99,8 +97,6 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv = this.findViewById(R.id.priority_tv);
         this.prioritySpinner = this.findViewById(R.id.priority_spinner);
         this.completedCb = this.findViewById(R.id.completed_cb);
-        this.pointsEarnedEt = this.findViewById(R.id.points_earned_et);
-        this.saveButton = this.findViewById(R.id.save_button);
 
         this.nameEt.setText(task.getName());
         this.descriptionEt.setText(task.getDescription());
@@ -112,44 +108,7 @@ public class TaskActivity extends AppCompatActivity {
         this.priorityTv.setText(r.getString(R.string.priority) + ": " +
                 task.getPriority().toString());
         this.completedCb.setChecked(task.isCompleted());
-        this.saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (task instanceof Assessment) {
-                    Assessment a = null;
-                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
-
-                    for (int j = 0; j < taskList.size(); j++) {
-                        if (taskList.get(j).getUniqueId() == task.getUniqueId()) {
-                            a = (Assessment) taskList.get(j);
-                        }
-                    }
-
-                    float points = Float.parseFloat(pointsEarnedEt.getText().toString());
-                    a.setPointsEarned(points);
-
-                    System.out.println(points);
-
-                    CalendarFragment.saveTaskList(context, taskList);
-                } else if (task instanceof Assignment) {
-                    Assignment a = null;
-                    ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
-
-                    for (int j = 0; j < taskList.size(); j++) {
-                        if (taskList.get(j).getUniqueId() == task.getUniqueId()) {
-                            a = (Assignment) taskList.get(j);
-                        }
-                    }
-
-                    a.setPointsEarned(Float.parseFloat(pointsEarnedEt.getText().toString()));
-                    CalendarFragment.saveTaskList(context, taskList);
-                }
-            }
-        });
-
-
-
-
+        
         addGoal = this.findViewById(R.id.add_goal);
 
         this.notifyCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
