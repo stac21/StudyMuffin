@@ -388,14 +388,12 @@ public class CalendarFragment extends Fragment {
         }
 
         public void removeCard() {
-            Task task = this.taskList.get(selectedCardPosition);
             this.taskList.remove(selectedCardPosition);
 
             this.notifyItemRemoved(selectedCardPosition);
             this.notifyItemChanged(selectedCardPosition, this.getItemCount());
 
             saveTaskList(view.getContext(), this.taskList);
-            // ClassFragment.setClassTaskList(getContext(), task);
         }
 
         /**

@@ -327,6 +327,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO change the colors of the icons to match the current theme
 
             CalendarFragment.isCardSelected = false;
+            ClassFragment.isCardSelected = false;
         } else {
             searchItem.setVisible(MainActivity.isInCalendarFragment);
             filterItem.setVisible(MainActivity.isInCalendarFragment);
@@ -393,8 +394,10 @@ public class MainActivity extends AppCompatActivity {
             this.startActivity(i);
         } else if (id == R.id.delete_item) {
             if (currentFragment == R.id.nav_calendar) {
+                System.out.println("Calendar clicked");
                 CalendarFragment.cardAdapter.removeCard();
             } else if (currentFragment == R.id.nav_classes) {
+                System.out.println("Classes clicke3d");
                 ClassFragment.cardAdapter.removeCard();
             }
 
