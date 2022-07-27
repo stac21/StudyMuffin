@@ -36,8 +36,8 @@ public class CourseActivity extends AppCompatActivity {
         Type collectionType = new TypeToken<CourseInfo>(){}.getType();
         CourseInfo course = new Gson().fromJson(json, collectionType);
 
-        float classGrade = course.calculateClassGrade(context);
-        String classGradeStr = (classGrade + "").equals("NaN") ? "Input tasks to see a grade" :
+        String classGrade = String.format("%.2f", course.calculateClassGrade(context));
+        String classGradeStr = (classGrade).equals("NaN") ? "Input tasks to see a grade" :
                 classGrade + "%";
 
         String startTimeStr = getAmPmFormat(course.getStartTimeHour(), course.getStartTimeMinute());

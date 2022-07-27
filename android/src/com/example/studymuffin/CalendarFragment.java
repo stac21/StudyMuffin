@@ -59,7 +59,6 @@ public class CalendarFragment extends Fragment {
     public static boolean isCardSelected = false;
     public static int selectedCardPosition;
     public static SortPreference sortPreference;
-    public static final int NUM_POINTS = 1000;
 
     private static boolean loadFromDb = true;
 
@@ -89,8 +88,6 @@ public class CalendarFragment extends Fragment {
         }
 
         cardAdapter = new CalendarCardAdapter(loadTaskList(context));
-
-        Task.idCounter = loadTaskIdCounter(context);
 
         courseList = ClassFragment.loadCourseList(context);
 
@@ -576,28 +573,29 @@ public class CalendarFragment extends Fragment {
                     }
                 }
             });
-        } else {
-            if (json != null) {
-                loadFromDb = true;
-                JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
-                String currentElementJson;
+        }
+        if (json != null) {
+            loadFromDb = true;
+            JsonArray jsonArray = new JsonParser().parse(json).getAsJsonArray();
+            String currentElementJson;
 
-                System.out.println("JSONArray size = " + jsonArray.size());
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    currentElementJson = jsonArray.get(i).toString();
+            System.out.println("JSONArray size = " + jsonArray.size());
+            for (int i = 0; i < jsonArray.size(); i++) {
+                currentElementJson = jsonArray.get(i).toString();
 
-                    System.out.println(currentElementJson);
+                System.out.println(currentElementJson);
 
-                    taskList.add(convertJsonToTask(currentElementJson));
-                }
+                taskList.add(convertJsonToTask(currentElementJson));
             }
         }
 
+        System.out.println("TaskList");
+
+        for (int i = 0; i < taskList.size(); i++) {
+            System.out.println(taskList.get(i));
+        }
+
         return taskList;
-    }
-
-    public static void loadTaskListFromDb(Context context) {
-
     }
 
     /**
@@ -672,30 +670,5 @@ public class CalendarFragment extends Fragment {
 
             ref.document(TASK_FILE).set(data);
         }
-    }
-
-    /**
-     * load the idCounter for tasks
-     * @param context the application's context
-     * @return the idCounter for task's
-     */
-    public static int loadTaskIdCounter(Context context) {
-        int counter = 0;
-
-        if (MainActivity.firebaseUser != null) {
-            System.out.println("The user account is not null");
-
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            CollectionReference ref = db.collection("Data").document("TaskData")
-                    .collection(MainActivity.firebaseUser.getEmail());
-            // ref.document(TASK_FILE).get();
-        } else {
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-
-            counter = sp.getInt(TASK_ID_COUNTER_FILE, 0);
-        }
-
-        return counter;
     }
 }

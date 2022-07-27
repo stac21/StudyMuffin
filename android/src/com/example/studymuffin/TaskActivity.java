@@ -125,6 +125,7 @@ public class TaskActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
                     System.out.println("IsChecked: " + task.getTaskType().toString());
+
                     if (task instanceof Assignment || task instanceof Assessment) {
                         System.out.println("In the condition");
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -139,7 +140,6 @@ public class TaskActivity extends AppCompatActivity {
                         builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
                             }
                         });
                         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -159,6 +159,7 @@ public class TaskActivity extends AppCompatActivity {
                                 positiveButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
+                                        completedCb.setEnabled(false);
                                         String pointsEarnedStr = pointsEarnedEt.getText().toString();
 
                                         if (pointsEarnedStr.length() != 0) {
@@ -218,10 +219,12 @@ public class TaskActivity extends AppCompatActivity {
                         MainActivity.profile.save(context);
                     }
                 } else {
+                    /*
                     task.setCompleted(false);
                     CalendarFragment.saveTask(context, task);
                     MainActivity.profile.substractPoints(NUM_POINTS);
                     MainActivity.profile.save(context);
+                    */
                 }
             }
         });

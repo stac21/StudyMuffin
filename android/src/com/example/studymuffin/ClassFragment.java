@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,30 +62,28 @@ public class ClassFragment extends Fragment {
     public static final String COURSE_ID_COUNTER_FILE = "com.example.studymuffin.course_id_counter_file";
     public static final String COURSE_INTENT = "com.example.studymuffin.course_intent";
 
-    public static float GPAcalculator(ArrayList<CourseInfo> a, Context context) {
-        float totalPoints=0;
+    public static float gpaCalculator(ArrayList<CourseInfo> a, Context context) {
+        float totalPoints = 0;
+        int countedCourses = a.size();
+        float grade;
 
-        for (int i=0; i< a.size(); i++) {
+        for (int i = 0; i < a.size(); i++) {
+            grade = a.get(i).calculateClassGrade(context);
 
-            if (a.get(i).calculateClassGrade(context) >= 90 ) {
-                totalPoints= totalPoints+ 4;
-            } else {
-                if (a.get(i).calculateClassGrade(context) >= 80 ) {
-                    totalPoints= totalPoints+ 3;
-                } else {
-                    if (a.get(i).calculateClassGrade(context) >= 70) {
-                        totalPoints= totalPoints+ 2;
-                    } else {
-                        if (a.get(i).calculateClassGrade(context) >= 60) {
-                            totalPoints= totalPoints+ 1;
-                        } else {
-                            totalPoints= totalPoints+ 0;
-                        }
-                    }
-                }
+            if (grade >= 90) {
+                totalPoints += 4;
+            } else if (grade >= 80) {
+                totalPoints += 3;
+            } else if (grade >= 70) {
+                totalPoints += 2;
+            } else if (grade >= 60) {
+                totalPoints += 1;
+            } else if (grade < 0) {
+                countedCourses--;
             }
         }
-        return totalPoints / a.size()*3;
+
+        return totalPoints / countedCourses;
     }
 
     @Nullable
@@ -99,15 +96,14 @@ public class ClassFragment extends Fragment {
         cardAdapter = new CardAdapter(loadCourseList(context));
 
         final String[] times = r.getStringArray(R.array.time_spinner_array);
-        CourseInfo.idCounter = loadCourseIdCounter(context);
         System.out.println("CourseInfo.idCounter = " + CourseInfo.idCounter);
 
         this.makeRecyclerView();
 
         FloatingActionButton fab = this.view.findViewById(R.id.classFab);
 
-        this.GPAview = view.findViewById(R.id.GPAview);
-        this.GPAview.setText(this.GPAcalculator(cardAdapter.getCourseInfoList(), context)+"");
+        this.GPAview = this.view.findViewById(R.id.GPAview);
+        this.GPAview.setText(gpaCalculator(cardAdapter.getCourseInfoList(), context) + "");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -460,6 +456,7 @@ public class ClassFragment extends Fragment {
 
         // save the data to firebase
         if (MainActivity.firebaseUser != null && MainActivity.firebaseUser.getEmail() != null) {
+            System.out.println("Course data firebase");
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             CollectionReference ref = db.collection("Data")
                     .document("CourseData")
@@ -492,14 +489,4 @@ public class ClassFragment extends Fragment {
         return noteList;
     }
 
-    /**
-     * load the idCounter for courses
-     * @param context the application's context
-     * @return the idCounter for courses, 0 if it hasn't been initialized yet
-     */
-    public static int loadCourseIdCounter(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-
-        return sp.getInt(COURSE_ID_COUNTER_FILE, 0);
-    }
 }

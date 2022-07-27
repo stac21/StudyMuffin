@@ -54,10 +54,9 @@ public class CourseInfo {
     }
 
     public float calculateClassGrade(Context context) {
-        float pointspossible = 0;
-        float pointsearned = 0;
-
         ArrayList<Task> taskList = CalendarFragment.loadTaskList(context);
+        float pointsPossible = 0;
+        float pointsEarned = 0;
 
         for (int i = 0; i < taskList.size(); i++) {
             Task task = taskList.get(i);
@@ -67,29 +66,27 @@ public class CourseInfo {
 
             // if the task belongs to this course, use it to calculate the grade
             if (task.getCourseId() == this.uniqueId) {
-                if (task instanceof Assessment) {
+                if (task instanceof Assessment && task.isCompleted()) {
                     System.out.println("Instance of Assessment");
 
                     Assessment a = (Assessment) taskList.get(i);
-                    pointspossible= pointspossible + a.getPointsPossible();
-                    pointsearned= pointsearned + a.getPointsEarned();
-                } else if (task instanceof Assignment) {
+                    pointsPossible += + a.getPointsPossible();
+                    pointsEarned += a.getPointsEarned();
+                } else if (task instanceof Assignment && task.isCompleted()) {
                     System.out.println("Instance of Assignment");
 
                     Assignment b = (Assignment) taskList.get(i);
-                    pointspossible = pointspossible + b.getPointsPossible();
-                    pointsearned = pointsearned + b.getPointsEarned();
-                } else {
-                    System.out.println("Still registering as a task");
+                    pointsPossible += b.getPointsPossible();
+                    pointsEarned += b.getPointsEarned();
                 }
             }
         }
 
-        System.out.println(pointsearned);
-        System.out.println(pointspossible);
-
-
-        return (pointsearned / pointspossible) * 100;
+        if (pointsPossible == 0) {
+            return -1;
+        } else {
+            return (pointsEarned / pointsPossible) * 100;
+        }
     }
 
     public int getStartTimeHour() {

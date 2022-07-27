@@ -162,6 +162,8 @@ public class BakeryDemo extends ApplicationAdapter {
 			}
 		});
 
+		System.out.println("StudyPoints: " + studyPoints);
+
 		// TODO make the size of the UI elements resolution dependent
 		table.row().colspan(3).expandX().fillX();
 		table.add(textButton).width(300).height(100).expandX().fillX();

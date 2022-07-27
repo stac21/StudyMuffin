@@ -67,9 +67,11 @@ public class BakeryMenu extends Dialog {
         group.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (BakeryDemo.studyPoints >= finalItem.getPrice() && isUpgradePurchased(finalItem)) {
+                if (BakeryDemo.studyPoints >= finalItem.getPrice() && !isUpgradePurchased(finalItem)) {
                     BakeryDemo.addUpgradeToWorld(finalItem);
                     BakeryDemo.studyPoints -= finalItem.getPrice();
+                } else {
+                    System.out.println("Cannot purchase upragade: " + BakeryDemo.studyPoints);
                 }
             }
         });
