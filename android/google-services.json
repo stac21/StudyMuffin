@@ -37,6 +37,35 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:170410199510:android:d3d252c275f669cc2cbc77",
+        "android_client_info": {
+          "package_name": "com.forloopers.studymuffin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDat4ElBw-c0UJ4_6UpraCLvpHnnKNe1wM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "170410199510-srodn9ajp0dq3p0t2tlo0sc51hgrlg7r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:170410199510:android:b3cc9c72bf4cdbfa2cbc77",
         "android_client_info": {
           "package_name": "com.mygdx.game"
